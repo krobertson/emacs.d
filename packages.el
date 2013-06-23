@@ -27,6 +27,13 @@
 
 ;;; packages
 
+(use-package ace-jump-mode
+  :ensure t
+  :bind ("C-c SPC" . ace-jump-mode)
+  :init
+  (progn
+    (require 'cl)))
+
 (use-package diminish
   :ensure t
   :config
