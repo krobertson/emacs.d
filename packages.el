@@ -27,6 +27,12 @@
 
 ;;; packages
 
+(use-package diminish
+  :ensure t
+  :config
+  (progn
+    (add-hook 'whitespace-mode-hook (lambda () (diminish 'whitespace-mode)))))
+
 (when is-mac
   (use-package exec-path-from-shell
     :init
@@ -152,6 +158,7 @@
                                          (powerline-raw erc-modified-channels-object face1 'l))
                                        (powerline-major-mode face1 'l)
                                        (powerline-process face1)
+                                       (powerline-minor-modes face1 'l)
                                        (powerline-narrow face1 'l)
                                        (powerline-raw " " face1)
                                        (funcall separator-left face1 face2)
