@@ -89,10 +89,14 @@
       '(powerline-default-separator 'arrow))
     (setq powerline-arrow-shape 'arrow14)
 
-    ;; Setup colors
+    ;; setup colors
     (set-face-background 'mode-line "grey16")
     (set-face-foreground 'powerline-active1 "#8FB28F")
     (set-face-foreground 'powerline-active2 "#AFD8AF")
+
+    ;; modeline items
+    (display-time-mode 1)
+    (display-battery-mode 1)
 
     ;; mode-line format
     (setq-default mode-line-format
@@ -139,4 +143,12 @@
 (use-package smex
   :ensure t
   :defer t
-  :bind ("M-x" . smex))
+  :bind (("M-x" . smex)
+         ("M-X" . smex-major-mode-commands))
+  :config
+  (progn
+    (smex-initialize)))
+
+(use-package yaml-mode
+  :ensure t
+  :defer t)

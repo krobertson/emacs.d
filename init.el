@@ -1,6 +1,6 @@
-;;; init.el
+;;;; init.el
 
-;;;; UI
+;; UI
 (if window-system
     (progn
       (tool-bar-mode -1)
@@ -23,7 +23,7 @@
   "Expand FILENAME relative to `user-emacs-directory'."
   (expand-file-name filename user-emacs-directory))
 
-;;;; *scratch* buffer
+;; *scratch* buffer
 (setq initial-scratch-message nil)
 (setq initial-major-mode 'text-mode)
 ;; Never kill, just bury
@@ -33,17 +33,17 @@
     t))
 (add-hook 'kill-buffer-query-functions 'dont-kill-but-bury-scratch)
 
-;;;; Annoyances
+;; annoyances
 (setq inhibit-splash-screen t)
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq ring-bell-function 'ignore)
 
-;;; no backup files, no auto-saving
+;; no backup files, no auto-saving
 (setq make-backup-files nil)
 (setq auto-save-default nil
       auto-save-list-file-prefix nil)
 
-;;;; Ido
+;; ido
 (ido-mode 1)
 (ido-everywhere 1)
 (setq ido-use-virtual-buffers t
@@ -64,10 +64,11 @@
  (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
 (add-hook 'ido-setup-hook 'ido-define-keys)
 
-;;;; Keyboard
+;; os x
 (when (string= system-type "darwin")
   (setq mac-option-modifier 'meta
         mac-command-modifier 'super
+        mac-allow-anti-aliasing t
         delete-by-moving-to-trash t
         trash-directory (expand-file-name ".Trash" (getenv "HOME"))))
 
@@ -75,5 +76,42 @@
 (setq whitespace-line-column 80)
 (setq whitespace-style '(face lines-tail))
 
-;;; External Packages
+;; highlight matching parenthesis
+(setq show-paren-style 'parenthesis)
+(show-paren-mode +1)
+
+;; highlight the current line
+(global-hl-line-mode +1)
+
+;; Tabs/indentation
+(setq-default tab-width 2)
+(setq-default indent-tabs-mode nil)
+
+;; aquamacs specific
+(when (boundp 'aquamacs-version)
+  (one-buffer-one-frame-mode 0))
+
+;;show a marker in the left fringe for lines not in the buffer
+(setq default-indicate-empty-lines t)
+
+;; Set the frame's title. %b is the name of the buffer. %+ indicates the
+;; state of the buffer: * if modified, % if read only, or - otherwise.
+;; Two of them to emulate the mode line. %f for the file name
+;; (absolute path actually).
+(setq frame-title-format "Emacs: %b %+%+ %f")
+
+;; recent file list
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+
+;; disable local variables
+(setq enable-local-variables nil)
+
+;; external packages
 (load (emacs-d "packages"))
+
+;; custom functions
+(load (emacs-d "functions"))
+
+;; keybindings
+(load (emacs-d "keybindings"))
