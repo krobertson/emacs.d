@@ -75,6 +75,7 @@
 ;; whitespace
 (setq whitespace-line-column 80)
 (setq whitespace-style '(face lines-tail))
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; highlight matching parenthesis
 (setq show-paren-style 'parenthesis)
