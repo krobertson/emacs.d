@@ -13,3 +13,5 @@
 ;; navigation
 (global-set-key [C-tab] 'other-window)
 (global-set-key [M-tab] (lambda () (interactive) (other-window -1)))
+
+(define-key prog-mode-map (kbd "s-/") 'comment-or-uncomment-region-or-line)
