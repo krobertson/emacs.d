@@ -1,3 +1,4 @@
 elpa/*-readme.txt
+elpa/archives/*
 *.elc
 var
