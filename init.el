@@ -67,6 +67,8 @@
 
 ;; Are we on a mac?
 (setq is-mac (equal system-type 'darwin))
+(when is-mac
+  (setq mouse-wheel-scroll-amount '(0.001)))
 
 ;; os x
 (when (string= system-type "darwin")
@@ -117,6 +119,7 @@
 
 ;; other vendored plugins
 (load (emacs-d "vendor/linum+"))
+(load (emacs-d "vendor/jekyll"))
 
 ;; custom functions
 (load (emacs-d "functions"))
@@ -128,6 +131,10 @@
 (add-hook 'prog-mode-hook
   (lambda ()
     (linum-mode)))
+
+;; configure jekyll blog
+(setq jekyll-post-ext ".md"
+      jekyll-directory (expand-file-name "~/blog/"))
 
 ;; emacs server
 (require 'server)

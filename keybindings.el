@@ -15,3 +15,16 @@
 (global-set-key [M-tab] (lambda () (interactive) (other-window -1)))
 
 (define-key prog-mode-map (kbd "s-/") 'comment-or-uncomment-region-or-line)
+
+
+;; jekyll
+(global-set-key (kbd "C-c b n") 'jekyll-draft-post)
+(global-set-key (kbd "C-c b P") 'jekyll-publish-post)
+(global-set-key (kbd "C-c b p") (lambda ()
+                                  (interactive)
+                                  (ido-find-file-in-dir
+                                    (concat jekyll-directory "_posts/"))))
+(global-set-key (kbd "C-c b d") (lambda ()
+                                  (interactive)
+                                  (ido-find-file-in-dir
+                                    (concat jekyll-directory "_drafts/"))))

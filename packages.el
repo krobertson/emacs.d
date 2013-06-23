@@ -57,6 +57,24 @@
     (setq ido-use-faces nil)
     (setq gc-cons-threshold 20000000)))
 
+(use-package edit-server
+  :ensure t
+  :if window-system
+  :init
+  (add-hook 'after-init-hook 'edit-server-start)
+  :config
+  (progn
+    (bind-key "C-c C-k" 'edit-server-abort edit-server-edit-mode-map)
+    (add-hook 'edit-server-start-hook
+              '(lambda ()
+                 (auto-fill-mode)
+                 (flyspell-mode)
+                 (set-fill-column 80)))))
+
+(use-package expand-region
+  :ensure t
+  :bind ("C-=" . er/expand-region))
+
 (use-package gist
   :ensure t
   :bind ("C-c C-g" . gist-region-or-buffer-private))
@@ -72,6 +90,16 @@
         (set (make-local-variable 'tab-width) 4)
         (whitespace-mode)
         (add-hook 'before-save-hook 'gofmt-before-save)))))
+
+(use-package ido-ubiquitous
+  :ensure t
+  :init
+  ;; Fix ido-ubiquitous for newer packages
+  (defmacro ido-ubiquitous-use-new-completing-read (cmd package)
+    `(eval-after-load ,package
+       '(defadvice ,cmd (around ido-ubiquitous-new activate)
+          (let ((ido-ubiquitous-enable-compatibility nil))
+            ad-do-it)))))
 
 (use-package markdown-mode
   :ensure t
