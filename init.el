@@ -46,6 +46,7 @@
 ;; ido
 (ido-mode 1)
 (ido-everywhere 1)
+(add-to-list 'ido-ignore-files "\\.DS_Store")
 (setq ido-use-virtual-buffers t
       recentf-save-file (emacs-d "var/recentf")
       ido-save-directory-list-file (emacs-d "var/ido-last.el"))
@@ -63,6 +64,9 @@
  (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
  (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
 (add-hook 'ido-setup-hook 'ido-define-keys)
+
+;; Are we on a mac?
+(setq is-mac (equal system-type 'darwin))
 
 ;; os x
 (when (string= system-type "darwin")
@@ -111,8 +115,21 @@
 ;; external packages
 (load (emacs-d "packages"))
 
+;; other vendored plugins
+(load (emacs-d "vendor/linum+"))
+
 ;; custom functions
 (load (emacs-d "functions"))
 
 ;; keybindings
 (load (emacs-d "keybindings"))
+
+;; enable linum in prog-mode
+(add-hook 'prog-mode-hook
+  (lambda ()
+    (linum-mode)))
+
+;; emacs server
+(require 'server)
+(unless (server-running-p)
+  (server-start))
