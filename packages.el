@@ -97,6 +97,10 @@
         (whitespace-mode)
         (add-hook 'before-save-hook 'gofmt-before-save)))))
 
+(use-package haml-mode
+  :ensure t
+  :defer t)
+
 (use-package ido-ubiquitous
   :ensure t
   :init
@@ -126,6 +130,7 @@
 
     ;; setup colors
     (set-face-background 'mode-line "grey16")
+    (set-face-background 'mode-line-inactive "grey16")
     (set-face-foreground 'powerline-active1 "#8FB28F")
     (set-face-foreground 'powerline-active2 "#AFD8AF")
 
@@ -175,6 +180,11 @@
                        (concat (powerline-render lhs)
                                (powerline-fill face2 (powerline-width rhs))
                                (powerline-render rhs))))))))
+
+(use-package ruby-electric
+  :ensure t
+  :defer t
+  :diminish ruby-electric-mode)
 
 (use-package smex
   :ensure t

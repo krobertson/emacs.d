@@ -127,6 +127,9 @@
 ;; keybindings
 (load (emacs-d "keybindings"))
 
+;; other mode configs
+(load (emacs-d "configs/ruby-mode"))
+
 ;; enable linum in prog-mode
 (add-hook 'prog-mode-hook
   (lambda ()
