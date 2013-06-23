@@ -1,19 +1,20 @@
 ;;;; init.el
 
+;; window size
+(setq default-frame-alist '(
+                (width . 190)
+                (height . 60) ))
+
 ;; UI
 (if window-system
     (progn
       (tool-bar-mode -1)
       (scroll-bar-mode -1)
       ;; 4px left, and no right right fringe
-      (set-fringe-style '(4 . 0))
-      ;; No menu bar when running from a terminal.
-      (menu-bar-mode -1)))
+      (set-fringe-style '(4 . 0))))
 
-;; window size
-(setq default-frame-alist '(
-                (width . 190)
-                (height . 60) ))
+;; no menu bar
+(menu-bar-mode -1)
 
 ;; set the theme
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
@@ -96,6 +97,7 @@
 
 ;; aquamacs specific
 (when (boundp 'aquamacs-version)
+  (setq user-emacs-directory "~/.emacs.d")
   (one-buffer-one-frame-mode 0))
 
 ;;show a marker in the left fringe for lines not in the buffer
