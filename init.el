@@ -11,7 +11,8 @@
       (tool-bar-mode -1)
       (scroll-bar-mode -1)
       ;; 4px left, and no right right fringe
-      (set-fringe-style '(4 . 0))))
+      (set-fringe-style '(4 . 0))
+      (x-focus-frame nil)))
 
 ;; no menu bar
 (menu-bar-mode -1)
