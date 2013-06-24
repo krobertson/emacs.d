@@ -34,6 +34,12 @@
   (progn
     (require 'cl)))
 
+(use-package auto-complete
+  :ensure t
+  :commands auto-complete-mode
+  :diminish auto-complete-mode
+  :defer t)
+
 (use-package diminish
   :ensure t
   :config
@@ -44,7 +50,7 @@
   (use-package exec-path-from-shell
     :init
     (progn
-      (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
+      (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
         (add-to-list 'exec-path-from-shell-variables var)))
     :config
     (progn
@@ -92,6 +98,10 @@
   :ensure t
   :bind ("C-c C-g" . gist-region-or-buffer-private))
 
+(use-package flycheck
+  :ensure t
+  :defer t)
+
 (use-package go-mode
   :ensure t
   :defer t
@@ -99,9 +109,14 @@
   (progn
     (add-hook 'go-mode-hook
       (lambda ()
+        (auto-complete-mode t)
+        (use-package go-autocomplete
+          :ensure t)
         (set (make-local-variable 'indent-tabs-mode) 't)
         (set (make-local-variable 'tab-width) 4)
         (whitespace-mode)
+        ;(load (concat (getenv "GOPATH") "/src/github.com/dougm/goflymake/go-flycheck"))
+        (flycheck-mode)
         (add-hook 'before-save-hook 'gofmt-before-save)))))
 
 (use-package haml-mode

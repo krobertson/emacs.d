@@ -1,4 +1,7 @@
 elpa/*-readme.txt
 elpa/archives/*
+ac-comphist.dat
+eshell
+tramp
 *.elc
 var
