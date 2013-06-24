@@ -123,6 +123,10 @@
 ;; disable local variables
 (setq enable-local-variables nil)
 
+;; configure hooks before we load packages and modes
+(load (emacs-d "autohooks"))
+(load-autohooks)
+
 ;; external packages
 (load (emacs-d "packages"))
 
@@ -138,11 +142,6 @@
 
 ;; other mode configs
 (load (emacs-d "configs/ruby-mode"))
-
-;; enable linum in prog-mode
-(add-hook 'prog-mode-hook
-  (lambda ()
-    (linum-mode)))
 
 ;; configure jekyll blog
 (setq jekyll-post-ext ".md"

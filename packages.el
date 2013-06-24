@@ -109,20 +109,7 @@
 
 (use-package go-mode
   :ensure t
-  :defer t
-  :config
-  (progn
-    (add-hook 'go-mode-hook
-      (lambda ()
-        (auto-complete-mode t)
-        (use-package go-autocomplete
-          :ensure t)
-        (set (make-local-variable 'indent-tabs-mode) 't)
-        (set (make-local-variable 'tab-width) 4)
-        (whitespace-mode)
-        ;(load (concat (getenv "GOPATH") "/src/github.com/dougm/goflymake/go-flycheck"))
-        (flycheck-mode)
-        (add-hook 'before-save-hook 'gofmt-before-save)))))
+  :defer t)
 
 (use-package haml-mode
   :ensure t
@@ -141,11 +128,7 @@
 (use-package markdown-mode
   :ensure t
   :mode ("\\.\\(m\\(ark\\)?down\\|md\\)$" . markdown-mode)
-  :config
-  (progn
-    (add-hook 'markdown-mode-hook
-      (lambda ()
-        (whitespace-mode)))))
+  :config)
 
 (use-package powerline
   :ensure t
