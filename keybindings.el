@@ -8,7 +8,9 @@
 (global-set-key (kbd "s-<up>")    'beginning-of-buffer)
 (global-set-key (kbd "s-<down>")  'end-of-buffer)
 
-(global-set-key (kbd "C-a")     'kr-mark-line)
+(global-set-key (kbd "C-a")          'kr-mark-line)
+(global-set-key (kbd "<C-return>")   'open-line-below)
+(global-set-key (kbd "<C-S-return>") 'open-line-above)
 
 ;; navigation
 (global-set-key [C-tab] 'other-window)
@@ -28,3 +30,5 @@
 
 ;; general prog-mode
 (define-key prog-mode-map (kbd "s-/") 'comment-or-uncomment-region-or-line)
+(define-key prog-mode-map (kbd "<C-M-down>") 'move-line-down)
+(define-key prog-mode-map (kbd "<C-M-up>") 'move-line-up)
