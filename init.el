@@ -129,7 +129,6 @@
 ;; other vendored plugins
 (load (emacs-d "vendor/jekyll"))
 (load (emacs-d "vendor/linum+"))
-(load (emacs-d "vendor/open-file-in-github"))
 
 ;; custom functions
 (load (emacs-d "functions"))

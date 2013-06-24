@@ -94,6 +94,11 @@
   :ensure t
   :bind ("C-=" . er/expand-region))
 
+(use-package github-browse-file
+  :ensure t
+  :commands github-browse-file
+            github-browse-file-blame)
+
 (use-package gist
   :ensure t
   :bind ("C-c C-g" . gist-region-or-buffer-private))
