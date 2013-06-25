@@ -38,6 +38,10 @@
   :ensure t
   :commands auto-complete-mode
   :diminish auto-complete-mode
+  :config
+  (progn
+    (setq ac-use-fuzzy t)
+    (setq ac-disable-inline t))
   :defer t)
 
 (use-package diminish
