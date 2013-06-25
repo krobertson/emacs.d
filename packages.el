@@ -145,6 +145,7 @@
     (set-face-foreground 'powerline-active2 "#AFD8AF")
 
     ;; modeline items
+    (setq display-time-default-load-average nil)
     (display-time-mode 1)
 
     ;; mode-line format
