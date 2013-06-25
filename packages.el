@@ -146,7 +146,6 @@
 
     ;; modeline items
     (display-time-mode 1)
-    (display-battery-mode 1)
 
     ;; mode-line format
     (setq-default mode-line-format
