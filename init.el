@@ -6,13 +6,12 @@
                 (height . 60) ))
 
 ;; UI
-(if window-system
-    (progn
-      (tool-bar-mode -1)
-      (scroll-bar-mode -1)
-      ;; 4px left, and no right right fringe
-      (set-fringe-style '(4 . 0))
-      (x-focus-frame nil)))
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+;; 4px left, and no right right fringe
+(if (fboundp 'set-fringe-style) (set-fringe-style '(4 . 0)))
+(if window-system (x-focus-frame nil))
 
 ;; no menu bar
 (menu-bar-mode -1)
