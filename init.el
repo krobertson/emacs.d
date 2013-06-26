@@ -126,9 +126,6 @@
 (setq global-auto-revert-non-file-buffers t
       auto-revert-verbose nil)
 
-;; disable local variables
-(setq enable-local-variables nil)
-
 ;; configure hooks before we load packages and modes
 (load (emacs-d "autohooks"))
 (load-autohooks)
