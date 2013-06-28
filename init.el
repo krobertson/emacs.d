@@ -48,7 +48,8 @@
 ;; no backup files, no auto-saving
 (setq make-backup-files nil)
 (setq auto-save-default nil
-      auto-save-list-file-prefix nil)
+      auto-save-list-file-prefix nil
+      create-lockfiles nil)
 
 ;; ido
 (ido-mode 1)
