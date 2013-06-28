@@ -9,7 +9,7 @@
 (global-set-key (kbd "s-<down>")  'end-of-buffer)
 
 (global-set-key (kbd "C-a")          'kr-mark-line)
-(global-set-key (kbd "C-k")          'kill-whole-line)
+(global-set-key (kbd "C-k")          'kr-kill-whole-line)
 (global-set-key (kbd "<C-return>")   'open-line-below)
 (global-set-key (kbd "<C-S-return>") 'open-line-above)
 

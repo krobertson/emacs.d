@@ -80,3 +80,12 @@
   (mapc 'kill-buffer
     (delq (current-buffer)
       (remove-if-not 'buffer-file-name (buffer-list)))))
+
+(defun kr-kill-whole-line ()
+  "Deletes a line, but does not put it in the kill-ring."
+  (interactive)
+  (setq last-command 'kr-kill-whole-line)
+  (kill-whole-line 1)
+  (setq kill-ring (cdr kill-ring))
+  (setq kill-ring-yank-pointer kill-ring)
+  (setq last-command 'kr-kill-whole-line))
