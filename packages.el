@@ -109,7 +109,13 @@
 
 (use-package flycheck
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  (progn
+    (set-face-underline 'flycheck-error nil)
+    (set-face-background 'flycheck-error "#8C5353")
+    (set-face-underline 'flycheck-warning nil)
+    (set-face-background 'flycheck-warning "#D0BF8F")))
 
 (use-package go-mode
   :ensure t
