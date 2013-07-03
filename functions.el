@@ -81,11 +81,19 @@
     (delq (current-buffer)
       (remove-if-not 'buffer-file-name (buffer-list)))))
 
-(defun kr-kill-whole-line ()
-  "Deletes a line, but does not put it in the kill-ring."
+(defun kr-delete-line ()
+  "Deletes the current line, doesn't affect kill-ring or clipboard."
   (interactive)
-  (setq last-command 'kr-kill-whole-line)
-  (kill-whole-line 1)
-  (setq kill-ring (cdr kill-ring))
-  (setq kill-ring-yank-pointer kill-ring)
-  (setq last-command 'kr-kill-whole-line))
+  (beginning-of-line)
+  (set-mark-command nil)
+  (next-line)
+  (delete-region (region-beginning) (region-end)))
+
+(defun smart-line-beginning ()
+  "Move point to the beginning of text on the current line; if that is already
+the current position of point, then move it to the beginning of the line."
+  (interactive)
+  (let ((pt (point)))
+    (beginning-of-line-text)
+    (when (eq pt (point))
+      (beginning-of-line))))
