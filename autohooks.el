@@ -3,7 +3,7 @@
 ;;;###autoload
 (defun load-autohooks ()
   (interactive)
-  (dolist (path (directory-files (concat user-emacs-directory "hooks") t ".*el$"))
+  (dolist (path (directory-files (concat user-emacs-directory "/hooks") t ".*el$"))
     (let* ((mode       (file-name-nondirectory (file-name-sans-extension path)))
            (hook-name  (intern (concat mode "-hook")))
            (defun-name (intern (concat "auto-" mode "-hook")))
