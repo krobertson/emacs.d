@@ -5,7 +5,7 @@
 ;; Author: Sebastian Wiesner <lunaryorn@gmail.com>
 ;; URL: https://github.com/lunaryorn/flycheck
 ;; Keywords: convenience languages tools
-;; Version: 0.13-cvs
+;; Version: 0.14-cvs
 ;; Package-Requires: ((s "1.6.0") (dash "1.2") (cl-lib "0.1") (emacs "24.1"))
 
 ;; This file is not part of GNU Emacs.
@@ -47,7 +47,7 @@
 (require 'cl-lib)                       ; For `cl-defstruct'
 (require 'help-mode)                    ; For `define-button-type'
 (require 'find-func)                    ; For `find-function-space-re', etc.
-(require 'package)       ; For `package-buffer-info' and `package-version-join''
+(require 'package)        ; For `package-buffer-info' and `package-version-join'
 
 
 ;;;; Compatibility
@@ -213,6 +213,18 @@ and there may be further syntax checkers in the chain.
 
 This variable is an abnormal hook.")
 
+(defcustom flycheck-display-errors-function 'flycheck-display-error-messages
+  "Function to display error messages.
+
+If set to a function, call the function with the list of errors
+to display as single argument.  Each error is an instance of the
+`flycheck-error' struct.
+
+If set to nil, do not display errors at all."
+  :group 'flycheck
+  :type 'function
+  :package-version '(flycheck . "0.13"))
+
 (defcustom flycheck-indication-mode 'left-fringe
   "The indication mode for Flycheck errors and warnings.
 
@@ -367,7 +379,9 @@ this hook.
 You should use this hook to conduct additional cleanup actions
 when Flycheck failed.
 
-This variable is a normal hook.")
+This variable is a normal hook."
+  :group 'flycheck
+  :type 'hook)
 
 ;; TODO: Remove the obsolete faces in 0.14
 (defface flycheck-error
@@ -534,15 +548,21 @@ buffer manually.
                                                         definition)))
     (with-temp-buffer
       (insert-file-contents source-file)
-      (aref (package-buffer-info) 3))))
+      (let ((info (package-buffer-info)))
+        (if (fboundp 'package-desc-version)
+            (package-version-join (package-desc-version info))
+          (aref (package-buffer-info) 3))))))
 
 (defun flycheck-package-version ()
   "Get the package version of Flycheck.
 
 This is the version number of the installed Flycheck package."
   (when (boundp 'package-alist)
-    (-when-let (info (cdr (assq 'flycheck package-alist)))
-      (package-version-join (aref info 0)))))
+    (-when-let (info (assq 'flycheck package-alist))
+      (package-version-join
+       (if (fboundp 'package-desc-version)
+           (package-desc-version (cadr info))
+         (aref (cdr info) 0))))))
 
 (defun flycheck-version (&optional show-version)
   "Get the Flycheck version as string.
@@ -2237,14 +2257,6 @@ Return the created overlay."
   "Return a list of all flycheck errors overlayed at POS."
   (--map (overlay-get it 'flycheck-error) (flycheck-overlays-at pos)))
 
-(defun flycheck-overlay-messages-at (pos)
-  "Return a list of all flycheck messages overlayed at POS."
-  (--map (overlay-get it 'help-echo) (flycheck-overlays-at pos)))
-
-(defun flycheck-overlay-messages-string-at (pos)
-  "Return a single string containing all error messages at POS."
-  (s-join "\n\n" (flycheck-overlay-messages-at pos)))
-
 (defvar-local flycheck-overlays-to-delete nil
   "Overlays mark for deletion after all syntax checks completed.")
 (put 'flycheck-overlays-to-delete 'permanent-local t)
@@ -2417,22 +2429,11 @@ Return the buffer containing the error listing."
     (user-error "Flycheck mode not enabled")))
 
 
-;;;; Error message echoing
-(defconst flycheck-error-message-buffer "*Flycheck error messages*"
-  "The name of the buffer to show long error messages in.")
-
-(defun flycheck-error-message-buffer ()
-  "Get the buffer object to show long error messages in.
-
-Get the buffer named by variable `flycheck-error-message-buffer',
-or nil if the buffer does not exist."
-  (get-buffer flycheck-error-message-buffer))
-
-(defun flycheck-display-error-messages (error-messages)
-  "Display Flycheck ERROR-MESSAGES."
-  (when error-messages
-    (display-message-or-buffer error-messages
-                               flycheck-error-message-buffer)))
+;;;; General error display
+(defun flycheck-display-errors (errors)
+  "Display ERRORS using `flycheck-display-errors-function'."
+  (when flycheck-display-errors-function
+    (funcall flycheck-display-errors-function errors)))
 
 (defvar-local flycheck-error-show-error-timer nil
   "Timer to automatically show the error at point in minibuffer.")
@@ -2447,8 +2448,8 @@ or nil if the buffer does not exist."
   "Show the all error messages at point in minibuffer."
   (flycheck-cancel-error-show-error-timer)
   (when flycheck-mode
-    (flycheck-display-error-messages
-     (flycheck-overlay-messages-string-at (point)))))
+    (-when-let (errors (flycheck-overlay-errors-at (point)))
+      (flycheck-display-errors errors))))
 
 (defun flycheck-show-error-at-point-soon ()
   "Show the first error message at point in minibuffer asap.
@@ -2459,6 +2460,32 @@ Show the error message at point in minibuffer after a short delay."
     (setq flycheck-error-show-error-timer
           (run-at-time 0.9 nil 'flycheck-show-error-at-point))))
 
+
+;;;; Error display functions
+(defconst flycheck-error-message-buffer "*Flycheck error messages*"
+  "The name of the buffer to show long error messages in.")
+
+(defun flycheck-error-message-buffer ()
+  "Get the buffer object to show long error messages in.
+
+Get the buffer named by variable `flycheck-error-message-buffer',
+or nil if the buffer does not exist."
+  (get-buffer flycheck-error-message-buffer))
+
+(defun flycheck-display-error-messages (errors)
+  "Display the messages of ERRORS.
+
+Concatenate all non-nil messages of ERRORS separated by empty
+lines, and display them with `display-message-or-buffer', which
+shows the messages either in the echo area or in a separate
+buffer, depending on the number of lines.
+
+In the latter case, show messages in
+`flycheck-error-message-buffer'."
+  (-when-let (messages (-keep #'flycheck-error-message errors))
+    (display-message-or-buffer (s-join "\n\n" messages)
+                               flycheck-error-message-buffer)))
+
 (defun flycheck-hide-error-buffer ()
   "Hide the Flycheck error buffer if necessary.
 
@@ -2468,12 +2495,17 @@ Hide the error buffer if there is no error under point."
     (unless (flycheck-overlays-at (point))
       (quit-window nil window))))
 
+
+;;;; Working with error messages
 (defun flycheck-copy-messages-as-kill (pos)
-  "Copy message under POS into kill ring."
+  "Copy each error message under POS into kill ring.
+
+Each error message under point is copied into the kill ring."
   (interactive "d")
-  (-when-let (error-messages (flycheck-overlay-messages-string-at pos))
-    (kill-new error-messages)
-    (flycheck-display-error-messages error-messages)))
+  (-when-let* ((errors (flycheck-overlay-errors-at pos))
+               (messages (-keep #'flycheck-error-message errors)))
+    (-each (nreverse messages) #'kill-new)
+    (flycheck-display-errors errors)))
 
 (defun flycheck-google-messages (pos &optional quote-flag)
   "Google each error message at POS.
@@ -2490,7 +2522,9 @@ This function requires the Google This library from URL
 `https://github.com/Bruce-Connor/emacs-google-this'."
   (interactive "d\nP")
   (if (fboundp 'google-string)
-      (let ((messages (flycheck-overlay-messages-at pos)))
+      (-when-let (messages (->> pos
+                             flycheck-overlay-errors-at
+                             (-keep #'flycheck-error-message)))
         (when (and flycheck-google-max-messages
                    (> (length messages) flycheck-google-max-messages))
           (user-error "More than %s messages at point"
@@ -2858,7 +2892,7 @@ See URL `https://github.com/w3c/tidy-html5'."
   '(("^line \\(?2:[0-9]+\\) column \\(?3:[0-9]+\\) - Error: \\(?4:.*\\)$" error)
     ("^line \\(?2:[0-9]+\\) column \\(?3:[0-9]+\\) - Warning: \\(?4:.*\\)$"
      warning))
-  :modes '(html-mode nxhtml-mode))
+  :modes '(html-mode nxhtml-mode web-mode))
 
 (flycheck-def-config-file-var flycheck-jshintrc javascript-jshint ".jshintrc")
 
@@ -3055,14 +3089,13 @@ See URL `http://docutils.sourceforge.net/'."
 (flycheck-declare-checker ruby-rubocop
   "A Ruby syntax and style checker using the RuboCop tool.
 
-See URL `https://github.com/bbatsov/rubocop'."
-  :command '("rubocop" "--emacs" "--silent"
+See URL `http://batsov.com/rubocop/'."
+  :command '("rubocop" "--format" "emacs" "--silent"
              (config-file "--config" flycheck-rubocoprc)
              source)
   :error-patterns
-  '(("^\\(?1:.*\\):\\(?2:[0-9]+\\): C: \\(?4:.*\\)$" warning)
-    ("^\\(?1:.*\\):\\(?2:[0-9]+\\): W: \\(?4:.*\\)$" warning)
-    ("^\\(?1:.*\\):\\(?2:[0-9]+\\): E: \\(?4:.*\\)$" error))
+  '(("^\\(?1:.*\\):\\(?2:[0-9]+\\):\\(?3:[0-9]+\\): \\(?:C\\|W\\): \\(?4:.*\\)$" warning)
+    ("^\\(?1:.*\\):\\(?2:[0-9]+\\):\\(?3:[0-9]+\\): \\(?:E\\|F\\): \\(?4:.*\\)$" error))
   :modes 'ruby-mode)
 
 (flycheck-declare-checker ruby

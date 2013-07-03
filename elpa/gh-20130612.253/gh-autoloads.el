@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads (gh-api-v3 gh-api) "gh-api" "gh-api.el" (20934
-;;;;;;  39377 0 0))
+;;;### (autoloads (gh-api-v3 gh-api) "gh-api" "gh-api.el" (20947
+;;;;;;  48313 0 0))
 ;;; Generated autoloads from gh-api.el
 
 (require 'eieio)
@@ -16,7 +16,7 @@
 ;;;***
 
 ;;;### (autoloads (gh-oauth-authenticator gh-password-authenticator
-;;;;;;  gh-authenticator) "gh-auth" "gh-auth.el" (20934 39377 0 0))
+;;;;;;  gh-authenticator) "gh-auth" "gh-auth.el" (20947 48314 0 0))
 ;;; Generated autoloads from gh-auth.el
 
 (require 'eieio)
@@ -29,14 +29,14 @@
 
 ;;;***
 
-;;;### (autoloads nil "gh-cache" "gh-cache.el" (20934 39377 0 0))
+;;;### (autoloads nil "gh-cache" "gh-cache.el" (20947 48313 0 0))
 ;;; Generated autoloads from gh-cache.el
 
 (require 'eieio)
 
 ;;;***
 
-;;;### (autoloads nil "gh-common" "gh-common.el" (20934 39377 0 0))
+;;;### (autoloads nil "gh-common" "gh-common.el" (20947 48313 0 0))
 ;;; Generated autoloads from gh-common.el
 
 (require 'eieio)
@@ -44,7 +44,7 @@
 ;;;***
 
 ;;;### (autoloads (gh-gist-gist gh-gist-gist-stub gh-gist-api) "gh-gist"
-;;;;;;  "gh-gist.el" (20934 39377 0 0))
+;;;;;;  "gh-gist.el" (20947 48313 0 0))
 ;;; Generated autoloads from gh-gist.el
 
 (require 'eieio)
@@ -57,15 +57,15 @@
 
 ;;;***
 
-;;;### (autoloads nil "gh-issues" "gh-issues.el" (20934 39377 0 0))
+;;;### (autoloads nil "gh-issues" "gh-issues.el" (20947 48313 0 0))
 ;;; Generated autoloads from gh-issues.el
 
 (require 'eieio)
 
 ;;;***
 
-;;;### (autoloads (gh-oauth-api) "gh-oauth" "gh-oauth.el" (20934
-;;;;;;  39377 0 0))
+;;;### (autoloads (gh-oauth-api) "gh-oauth" "gh-oauth.el" (20947
+;;;;;;  48314 0 0))
 ;;; Generated autoloads from gh-oauth.el
 
 (require 'eieio)
@@ -75,7 +75,7 @@
 ;;;***
 
 ;;;### (autoloads (gh-orgs-org-stub gh-orgs-api) "gh-orgs" "gh-orgs.el"
-;;;;;;  (20934 39377 0 0))
+;;;;;;  (20947 48314 0 0))
 ;;; Generated autoloads from gh-orgs.el
 
 (require 'eieio)
@@ -87,7 +87,7 @@
 ;;;***
 
 ;;;### (autoloads (gh-pulls-request gh-pulls-api) "gh-pulls" "gh-pulls.el"
-;;;;;;  (20934 39377 0 0))
+;;;;;;  (20947 48313 0 0))
 ;;; Generated autoloads from gh-pulls.el
 
 (require 'eieio)
@@ -99,7 +99,7 @@
 ;;;***
 
 ;;;### (autoloads (gh-repos-repo gh-repos-repo-stub gh-repos-api)
-;;;;;;  "gh-repos" "gh-repos.el" (20934 39377 0 0))
+;;;;;;  "gh-repos" "gh-repos.el" (20947 48313 0 0))
 ;;; Generated autoloads from gh-repos.el
 
 (require 'eieio)
@@ -112,15 +112,15 @@
 
 ;;;***
 
-;;;### (autoloads nil "gh-url" "gh-url.el" (20934 39377 0 0))
+;;;### (autoloads nil "gh-url" "gh-url.el" (20947 48314 0 0))
 ;;; Generated autoloads from gh-url.el
 
 (require 'eieio)
 
 ;;;***
 
-;;;### (autoloads nil nil ("gh-pkg.el" "gh-profile.el" "gh.el") (20934
-;;;;;;  39377 639252 0))
+;;;### (autoloads nil nil ("gh-pkg.el" "gh-profile.el" "gh.el") (20947
+;;;;;;  48314 25264 0))
 
 ;;;***
 

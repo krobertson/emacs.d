@@ -1,4 +1,4 @@
-This is /home/melpa/melpa/working/flycheck-20130606.1406/flycheck.info,
+This is /home/melpa/melpa/working/flycheck-20130702.2003/flycheck.info,
 produced by makeinfo version 4.13 from
 /home/melpa/melpa/working/flycheck/doc/flycheck.texi.
 
@@ -623,10 +623,24 @@ Flycheck:
 `M-x flycheck-list-errors'
      List all errors in the current buffer in a separate buffer.
 
-   To view an error message, either hover the mouse of the highlighted
-error, or move the point to the highlighted error and wait for a short
-moment to see the error message in the echo area.  You can also copy the
-error message into kill ring, or google it straight from Emacs:
+   If you hover a highlighted error with the mouse, a tooltip with the
+top-most error message will be shown.
+
+   Flycheck also displays errors under point, via
+`flycheck-display-errors-function':
+
+ -- User Option: flycheck-display-errors-function
+     A function to display errors under point.
+
+     If set to a function, call the function with a list of all errors
+     to show.  If set to nil, to not display errors at all.
+
+     The default function `flycheck-display-error-messages' shows all
+     error messages separated by empty lines in the echo area or in a
+     separate buffer depending on the number of messages.
+
+   You can also work with the error messages at point, and copy them
+into the kill ring or search them on Google:
 
 `C-c ! C-w'
 `M-x flycheck-copy-messages-as-kill'
@@ -1601,8 +1615,8 @@ using the *note ERT: (ert)Top. library.
    * Familiarize yourself with the test suite in
      `flycheck-testsuite.el'.
 
-   * Add your tests to the appropriate file.  Create a new test file if
-     necessary.
+   * Add your tests at the appropriate.  Keep the order of tests
+     corresponding to the order of declarations in `flycheck.el'.
 
    * Extend the provisioning script `vagrant/provision.sh' with the
      dependencies of your tests, if necessary.  This includes syntax
@@ -1632,6 +1646,7 @@ This appendix provides a comprehensive changelog of all releases:
 * Menu:
 
 * master        :: unreleased
+* 0.13          :: Jun 28, 2013
 * 0.12          :: May 18, 2013
 * 0.11          :: May 01, 2013
 * 0.10          :: Apr 21, 2013
@@ -2109,7 +2124,7 @@ File: flycheck.info,  Node: 0.11,  Next: 0.12,  Prev: 0.10,  Up: Changes
 
 
 
-File: flycheck.info,  Node: 0.12,  Next: master,  Prev: 0.11,  Up: Changes
+File: flycheck.info,  Node: 0.12,  Next: 0.13,  Prev: 0.11,  Up: Changes
 
 0.12 (May 18, 2013)
 ===================
@@ -2147,9 +2162,9 @@ File: flycheck.info,  Node: 0.12,  Next: master,  Prev: 0.11,  Up: Changes
 
 
 
-File: flycheck.info,  Node: master,  Prev: 0.12,  Up: Changes
+File: flycheck.info,  Node: 0.13,  Next: master,  Prev: 0.12,  Up: Changes
 
-master (unreleased)
+0.13 (Jun 28, 2013)
 ===================
 
    * Breaking changes:
@@ -2175,6 +2190,10 @@ master (unreleased)
           via `flycheck-idle-change-delay'
           (https://github.com/lunaryorn/flycheck/issues/144)
 
+        * Make display of errors under point customizable via
+          `flycheck-display-errors-function'
+          (https://github.com/lunaryorn/flycheck/issues/156)
+
    * Improvements
 
         * Always highlight errors on top of warnings now
@@ -2196,6 +2215,9 @@ master (unreleased)
         * Predicate forms are now wrapped into functions and compiled
           into functions during byte compilation
 
+        * Copy each message separately in
+          `flycheck-copy-messages-as-kill'
+
    * Bug fixes:
 
         * Fix error when searching for a configuration file outside a
@@ -2215,6 +2237,23 @@ master (unreleased)
 
         * Fix compatibility with Emacs 24.2 and earlier
           (https://github.com/lunaryorn/flycheck/issues/150)
+
+        * Fix version information on Emacs trunk builds
+
+
+
+File: flycheck.info,  Node: master,  Prev: 0.13,  Up: Changes
+
+master (unreleased)
+===================
+
+   * Improvements:
+
+        * Support (https://github.com/lunaryorn/flycheck/issues/157)
+          Web Mode (http://web-mode.org/) in `html-tidy' syntax checker
+
+        * Support Rubocop 0.9 and drop support for older Rubocop
+          releases (https://github.com/lunaryorn/flycheck/issues/159)
 
 
 
@@ -2264,6 +2303,9 @@ their support and patches are greatly appreciated.
    * Peter Vasil (https://github.com/ptrv) contributed syntax checkers
      for XML, Lua and Go (using `go build' and `go test'), added unit
      tests and did valuable testing.
+
+   * Robert Dallas Gray (https://github.com/rdallasgray) made error
+     display customizable with `flycheck-display-errors-function'.
 
    * Robert Zaremba (https://github.com/robert-zaremba) added Go syntax
      checker using `gofmt'.
@@ -2882,15 +2924,16 @@ Type, Function and Variable Definition Index
 * flycheck-checker:                      Selection.           (line  44)
 * flycheck-checkers:                     Selection.           (line  10)
 * flycheck-chktexrc:                     Configuration.       (line  26)
-* flycheck-clear:                        Reporting.           (line 113)
+* flycheck-clear:                        Reporting.           (line 127)
 * flycheck-coffeelintrc:                 Configuration.       (line  29)
-* flycheck-copy-messages-as-kill:        Reporting.           (line  96)
+* flycheck-copy-messages-as-kill:        Reporting.           (line 110)
 * flycheck-count-errors:                 Error API.           (line 110)
 * flycheck-current-errors:               Error API.           (line 106)
 * flycheck-declare-checker:              Declaration.         (line   9)
 * flycheck-def-config-file-var:          Declaration.         (line 269)
 * flycheck-def-option-var:               Declaration.         (line 285)
 * flycheck-describe-checker:             Selection.           (line  72)
+* flycheck-display-errors-function:      Reporting.           (line  96)
 * flycheck-error <1>:                    Error API.           (line  11)
 * flycheck-error:                        Reporting.           (line  17)
 * flycheck-error-column-region:          Error API.           (line  81)
@@ -2906,7 +2949,7 @@ Type, Function and Variable Definition Index
 * flycheck-flake8rc:                     Configuration.       (line  32)
 * flycheck-fringe-error:                 Reporting.           (line  53)
 * flycheck-fringe-warning:               Reporting.           (line  54)
-* flycheck-google-messages:              Reporting.           (line 101)
+* flycheck-google-messages:              Reporting.           (line 115)
 * flycheck-has-errors-p:                 Error API.           (line 115)
 * flycheck-highlighting-mode:            Reporting.           (line  31)
 * flycheck-idle-change-delay:            Syntax checking.     (line  47)
@@ -2938,44 +2981,45 @@ Node: Syntax checking7585
 Node: Selection12051
 Node: Configuration14658
 Node: Reporting18200
-Node: Navigation22613
-Node: Mode line24422
-Node: Extending25328
-Node: Declaration25927
-Node: Error parsers38990
-Node: Option filters40076
-Node: Examples40415
-Node: Simple example40847
-Node: Predicate example43898
-Node: Configuration example45879
-Node: Chaining example48527
-Node: API49901
-Node: Error API50689
-Node: Error parser API54886
-Node: Contribution55112
-Node: Reporting issues55790
-Node: Contributing syntax checkers56603
-Node: Contributing code57400
-Node: Unit tests58747
-Node: Changes60041
-Node: 0.160721
-Node: 0.261011
-Node: 0.361290
-Node: 0.461526
-Node: 0.562308
-Node: 0.663534
-Node: 0.6.166402
-Node: 0.766551
-Node: 0.7.167572
-Node: 0.868292
-Node: 0.969815
-Node: 0.1070314
-Node: 0.1172381
-Node: 0.1273573
-Node: master74587
-Node: Credits76859
-Node: GNU Free Documentation License79908
-Node: Syntax checkers105081
-Node: Definition Index106158
+Node: Navigation23074
+Node: Mode line24883
+Node: Extending25789
+Node: Declaration26388
+Node: Error parsers39451
+Node: Option filters40537
+Node: Examples40876
+Node: Simple example41308
+Node: Predicate example44359
+Node: Configuration example46340
+Node: Chaining example48988
+Node: API50362
+Node: Error API51150
+Node: Error parser API55347
+Node: Contribution55573
+Node: Reporting issues56251
+Node: Contributing syntax checkers57064
+Node: Contributing code57861
+Node: Unit tests59208
+Node: Changes60545
+Node: 0.161257
+Node: 0.261547
+Node: 0.361826
+Node: 0.462062
+Node: 0.562844
+Node: 0.664070
+Node: 0.6.166938
+Node: 0.767087
+Node: 0.7.168108
+Node: 0.868828
+Node: 0.970351
+Node: 0.1070850
+Node: 0.1172917
+Node: 0.1274109
+Node: 0.1375121
+Node: master77718
+Node: Credits78123
+Node: GNU Free Documentation License81308
+Node: Syntax checkers106481
+Node: Definition Index107558
 
 End Tag Table

@@ -3,12 +3,18 @@
 ;;; Code:
 
 
-;;;### (autoloads (fiplr-reload-list fiplr-clear-cache fiplr-find-file)
-;;;;;;  "fiplr" "fiplr.el" (20934 39338 0 0))
+;;;### (autoloads (fiplr-clear-cache fiplr-find-directory fiplr-find-file)
+;;;;;;  "fiplr" "fiplr.el" (20947 48316 0 0))
 ;;; Generated autoloads from fiplr.el
 
 (autoload 'fiplr-find-file "fiplr" "\
 Runs a completing prompt to find a file from the project.
+The root of the project is the return value of `fiplr-root'.
+
+\(fn)" t nil)
+
+(autoload 'fiplr-find-directory "fiplr" "\
+Runs a completing prompt to find a directory from the project.
 The root of the project is the return value of `fiplr-root'.
 
 \(fn)" t nil)
@@ -18,14 +24,9 @@ Clears the internal caches used by fiplr so the project is searched again.
 
 \(fn)" t nil)
 
-(autoload 'fiplr-reload-list "fiplr" "\
-Clear caches and reload the file listing.
-
-\(fn)" t nil)
-
 ;;;***
 
-;;;### (autoloads nil nil ("fiplr-pkg.el") (20934 39338 473962 0))
+;;;### (autoloads nil nil ("fiplr-pkg.el") (20947 48316 50988 0))
 
 ;;;***
 
