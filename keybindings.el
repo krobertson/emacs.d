@@ -17,6 +17,8 @@
 (global-set-key (kbd "s-<up>")    'beginning-of-buffer)
 (global-set-key (kbd "s-<down>")  'end-of-buffer)
 
+(global-set-key (kbd "S-s-<left>")  'smart-move-line-beginning)
+
 (global-set-key (kbd "C-a")          'kr-mark-line)
 (global-set-key (kbd "C-k")          'kr-delete-line)
 (global-set-key (kbd "<C-return>")   'open-line-below)
