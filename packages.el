@@ -36,13 +36,17 @@
 
 (use-package auto-complete
   :ensure t
-  :commands auto-complete-mode
   :diminish auto-complete-mode
   :config
   (progn
-    (setq ac-use-fuzzy t)
-    (setq ac-disable-inline t))
-  :defer t)
+    (use-package go-autocomplete
+      :ensure t)
+    (setq ac-use-fuzzy t
+          ac-disable-inline t
+          ac-use-menu-map t
+          ac-auto-show-menu t
+          ac-auto-start t
+          ac-candidate-menu-min 0)))
 
 (use-package diminish
   :ensure t

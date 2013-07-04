@@ -1,7 +1,5 @@
 ;; go autocomplete mode
 (auto-complete-mode t)
-(use-package go-autocomplete
-  :ensure t)
 
 ;; tab preferences - use real tabs and 4 width
 (set (make-local-variable 'indent-tabs-mode) 't)
