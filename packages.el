@@ -54,6 +54,10 @@
   (progn
     (add-hook 'whitespace-mode-hook (lambda () (diminish 'whitespace-mode)))))
 
+(use-package evil
+  :ensure t
+  :commands evil-mode)
+
 (when is-mac
   (use-package exec-path-from-shell
     :init
