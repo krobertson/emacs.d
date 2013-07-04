@@ -26,6 +26,12 @@
 (blink-cursor-mode t)
 (setq-default blink-matching-paren t)
 
+;; cua mode
+(cua-mode t)
+(setq cua-auto-tabify-rectangles nil
+      cua-keep-region-after-copy t)
+(transient-mark-mode 1)
+
 (defun emacs-d (filename)
   "Expand FILENAME relative to `user-emacs-directory'."
   (expand-file-name filename user-emacs-directory))
