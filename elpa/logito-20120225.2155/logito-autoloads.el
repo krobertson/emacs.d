@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads nil nil ("logito-pkg.el" "logito.el") (20934 39375
-;;;;;;  891018 0))
+;;;### (autoloads nil nil ("logito-pkg.el" "logito.el") (21079 35186
+;;;;;;  990129 0))
 
 ;;;***
 

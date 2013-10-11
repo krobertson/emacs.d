@@ -81,11 +81,9 @@
 (use-package flx
   :ensure t
   :defer t
-  :init
-  (progn
-    (flx-ido-mode 1))
   :config
   (progn
+    (flx-ido-mode 1)
     (setq ido-use-faces nil)
     (setq gc-cons-threshold 20000000)))
 
@@ -109,8 +107,7 @@
 
 (use-package github-browse-file
   :ensure t
-  :commands github-browse-file
-            github-browse-file-blame)
+  :commands github-browse-file)
 
 (use-package gist
   :ensure t
