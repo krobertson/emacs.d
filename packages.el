@@ -46,6 +46,7 @@
           ac-use-menu-map t
           ac-auto-show-menu t
           ac-auto-start t
+          ac-ignore-case t
           ac-candidate-menu-min 0)))
 
 (use-package diminish
@@ -121,7 +122,7 @@
   :config
   (progn
     (set-face-underline 'flycheck-error nil)
-    (set-face-background 'flycheck-error "#8C5353")
+    (set-face-background 'flycheck-error nil)
     (set-face-underline 'flycheck-warning nil)
     (set-face-background 'flycheck-warning "#D0BF8F")))
 
