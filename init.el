@@ -93,7 +93,7 @@
         trash-directory (expand-file-name ".Trash" (getenv "HOME"))))
 
 ;; whitespace
-(setq whitespace-line-column 80)
+(setq whitespace-line-column 200)
 (setq whitespace-style '(face lines-tail))
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
@@ -153,6 +153,8 @@
 ;; other mode configs
 (load (emacs-d "configs/markdown-mode"))
 (load (emacs-d "configs/ruby-mode"))
+(load (emacs-d "configs/dconf-mode"))
+(load (emacs-d "configs/policy-mode"))
 
 ;; configure jekyll blog
 (setq jekyll-post-ext ".md"
@@ -162,3 +164,11 @@
 (require 'server)
 (unless (server-running-p)
   (server-start))
+
+
+(require 'projectile)
+(projectile-global-mode t)
+(setq projectile-globally-ignored-files
+          (append projectile-globally-ignored-files
+                          '(;; visual studio
+                                "*.cntmp" )))

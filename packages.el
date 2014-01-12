@@ -27,6 +27,18 @@
 
 ;;; packages
 
+(when is-mac
+  (use-package exec-path-from-shell
+    :ensure t
+    :init
+    (progn
+      (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
+        (add-to-list 'exec-path-from-shell-variables var)))
+    :config
+    (progn
+      (exec-path-from-shell-initialize))))
+
+
 (use-package ace-jump-mode
   :ensure t
   :bind ("C-c SPC" . ace-jump-mode)
@@ -58,16 +70,6 @@
 (use-package evil
   :ensure t
   :commands evil-mode)
-
-(when is-mac
-  (use-package exec-path-from-shell
-    :init
-    (progn
-      (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
-        (add-to-list 'exec-path-from-shell-variables var)))
-    :config
-    (progn
-      (exec-path-from-shell-initialize))))
 
 (use-package fiplr
   :ensure t
@@ -234,3 +236,10 @@
 (use-package yaml-mode
   :ensure t
   :defer t)
+
+
+(use-package multiple-cursors
+  :ensure t
+  :bind (("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-all-like-this)
+         ("C-c C-<" . mc/mark-previous-like-this)))

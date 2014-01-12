@@ -44,6 +44,7 @@
 (define-key prog-mode-map (kbd "s-/")        'comment-or-uncomment-region-or-line)
 (define-key prog-mode-map (kbd "<C-M-down>") 'move-line-down)
 (define-key prog-mode-map (kbd "<C-M-up>")   'move-line-up)
+(define-key prog-mode-map (kbd "s-F")        'projectile-grep)
 
 (global-unset-key (kbd "<S-down-mouse-1>"))
 (global-set-key (kbd "<S-mouse-1>") 'mouse-save-then-kill)
