@@ -155,6 +155,7 @@
     (load file)))
 
 ;; other vendored plugins
+(add-to-list 'load-path (emacs-d "vendor"))
 (load (emacs-d "vendor/jekyll"))
 (load (emacs-d "vendor/linum+"))
 

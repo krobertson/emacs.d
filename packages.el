@@ -128,6 +128,13 @@
          ("C-<" . mc/mark-all-like-this)
          ("C-c C-<" . mc/mark-previous-like-this)))
 
+(use-package ox-reveal
+  :defer t
+  :init
+  (progn
+    (setq org-reveal-root (concat "file://" (emacs-d "vendor/reveal.js"))))
+ :commands (org-reveal-export-to-html org-reveal-export-to-html-and-browse))
+
 (use-package powerline)
 
 (use-package projectile
