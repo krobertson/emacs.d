@@ -101,6 +101,21 @@
           (let ((ido-ubiquitous-enable-compatibility nil))
             ad-do-it)))))
 
+(use-package magit
+  :init
+  (progn
+    (use-package magit-blame)
+    (bind-key "C-c C-a" 'magit-just-amend magit-mode-map))
+  :config
+  (progn
+    (setq magit-default-tracking-name-function 'magit-default-tracking-name-branch-only)
+    (setq magit-set-upstream-on-push t)
+    (setq magit-completing-read-function 'magit-ido-completing-read)
+    (setq magit-stage-all-confirm nil)
+    (setq magit-unstage-all-confirm nil)
+    (setq magit-restore-window-configuration t))
+  :bind ("C-x g" . magit-status))
+
 (use-package markdown-mode
   :mode ("\\.\\(m\\(ark\\)?down\\|md\\)$" . markdown-mode)
   :config)
@@ -131,6 +146,12 @@
         ;; continuum import files
         "*.cntmp" )))
     (add-to-list 'projectile-globally-ignored-files ".DS_Store")))
+
+(use-package enh-ruby-mode
+  :defer t)
+
+(use-package ruby-end
+  :diminish ruby-end-mode)
 
 (use-package ruby-electric
   :defer t
