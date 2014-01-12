@@ -3,3 +3,6 @@
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (add-hook 'text-mode-hook
   '(lambda() (set-fill-column 80)))
+
+(require 'ox-confluence)
+(require 'ox-html)

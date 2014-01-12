@@ -1,9 +1,14 @@
 ;;;; init.el
 
+; ;; == package mgmt ==========================================================
+
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+
 ;; window size
-(setq default-frame-alist '(
-                (width . 190)
-                (height . 60) ))
+(setq default-frame-alist '((font . "SauceCodePowerline-Regular-12")
+                            (width . 190)
+                            (height . 60)))
 
 ;; UI
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
@@ -12,9 +17,7 @@
 ;; 4px left, and no right right fringe
 (if (fboundp 'set-fringe-style) (set-fringe-style '(4 . 0)))
 (if window-system (x-focus-frame nil))
-
-;; no menu bar
-(menu-bar-mode -1)
+(setq default-line-spacing 0)
 
 ;; set the theme
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
@@ -71,12 +74,12 @@
 ;                          " [Too Big]" " [Confirm]")))
 
 (defun ido-disable-line-truncation ()
- (set (make-local-variable 'truncate-lines) nil))
+  (set (make-local-variable 'truncate-lines) nil))
 (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
 
 (defun ido-define-keys () ;; C-n/p is more intuitive in vertical layout
- (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
- (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
+  (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
+  (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
 (add-hook 'ido-setup-hook 'ido-define-keys)
 
 ;; Are we on a mac?
@@ -93,9 +96,12 @@
         trash-directory (expand-file-name ".Trash" (getenv "HOME"))))
 
 ;; whitespace
-(setq whitespace-line-column 200)
+(setq whitespace-line-column 120)
 (setq whitespace-style '(face lines-tail))
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; autofill
+(set-fill-column 80)
 
 ;; highlight matching parenthesis
 (setq show-paren-style 'parenthesis)
@@ -140,21 +146,22 @@
 ;; external packages
 (load (emacs-d "packages"))
 
+;; -- load everything from dotfiles-init-dir ---------------------------------
+(setq init-file (or load-file-name buffer-file-name))
+(setq dotfiles-dir (file-name-directory init-file))
+(setq dotfiles-init-dir (expand-file-name "configs" dotfiles-dir))
+(if (file-exists-p dotfiles-init-dir)
+  (dolist (file (directory-files dotfiles-init-dir t "\\.el$"))
+    (load file)))
+
 ;; other vendored plugins
 (load (emacs-d "vendor/jekyll"))
 (load (emacs-d "vendor/linum+"))
 
 ;; custom functions
 (load (emacs-d "functions"))
-
 ;; keybindings
 (load (emacs-d "keybindings"))
-
-;; other mode configs
-(load (emacs-d "configs/markdown-mode"))
-(load (emacs-d "configs/ruby-mode"))
-(load (emacs-d "configs/dconf-mode"))
-(load (emacs-d "configs/policy-mode"))
 
 ;; configure jekyll blog
 (setq jekyll-post-ext ".md"
@@ -164,11 +171,3 @@
 (require 'server)
 (unless (server-running-p)
   (server-start))
-
-
-(require 'projectile)
-(projectile-global-mode t)
-(setq projectile-globally-ignored-files
-          (append projectile-globally-ignored-files
-                          '(;; visual studio
-                                "*.cntmp" )))

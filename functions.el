@@ -104,3 +104,13 @@ the current position of point, then move it to the beginning of the line."
   (interactive)
   (set-mark-command nil)
   (smart-line-beginning))
+
+(defun ad-advised-definition-p (definition)
+  "Return non-nil if DEFINITION was generated from advice information."
+  (if (or (ad-lambda-p definition)
+    (macrop definition)
+    (ad-compiled-p definition))
+      (let ((docstring (ad-docstring definition)))
+  (and (stringp docstring)
+      (get-text-property 0 'dynamic-docstring-function docstring)))))
+

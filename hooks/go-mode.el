@@ -3,10 +3,13 @@
 
 ;; tab preferences - use real tabs and 4 width
 (set (make-local-variable 'indent-tabs-mode) 't)
-(set (make-local-variable 'tab-width) 4)
+(set (make-local-variable 'tab-width) 2)
 
 ;; highlight anything over 80 characters
 (whitespace-mode)
+
+;; run gofmt on save
+(add-hook 'before-save-hook 'gofmt-before-save)
 
 ;; enable flycheck mode
 ;(load (concat (getenv "GOPATH") "/src/github.com/dougm/goflymake/go-flycheck"))
@@ -15,8 +18,5 @@
       :command '("gofmt" source-inplace)
       :error-patterns '(("^\\(?1:.*\\):\\(?2:[0-9]+\\):\\(?3:[0-9]+\\): \\(?4:.*\\)$" error))
       :modes 'go-mode)
-    (add-to-list 'flycheck-checkers 'go-gofmt)
+(add-to-list 'flycheck-checkers 'go-gofmt)
 (flycheck-mode)
-
-;; run gofmt on save
-(add-hook 'before-save-hook 'gofmt-before-save)

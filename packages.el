@@ -1,35 +1,11 @@
 ;;;; package.el
-(require 'package)
-(setq package-user-dir "~/.emacs.d/elpa/")
-(setq package-archives
-      (append package-archives
-              '(("melpa" . "http://melpa.milkbox.net/packages/"))
-              '(("org" . "http://orgmode.org/elpa/"))))
-
-;; Load the list of packages but don't initialize them.
-;; `use-package' will arrange the necessary autoload entries.
-(package-initialize nil)
-
-;; If never connected to repositories before, download package descriptions so
-;; `use-package' can trigger installation of missing packages.
-(unless package-archive-contents
-    (message "Refreshing ELPA package archives...")
-    (package-refresh-contents))
-
-;; ...but before everything, make sure `use-package' is installed.
-(unless (package-installed-p 'use-package)
-  (message "`use-package' not found.  Installing...")
-  (package-install 'use-package))
 
 (require 'use-package)
-(setq use-package-minimum-reported-time 0)
-
 
 ;;; packages
 
 (when is-mac
   (use-package exec-path-from-shell
-    :ensure t
     :init
     (progn
       (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
@@ -38,41 +14,45 @@
     (progn
       (exec-path-from-shell-initialize))))
 
-
 (use-package ace-jump-mode
-  :ensure t
   :bind ("C-c SPC" . ace-jump-mode)
   :init
   (progn
     (require 'cl)))
 
+(use-package ag
+  :commands (ag ag-files ag-regexp ag-project ag-project-files ag-project-regexp)
+  :config
+  (progn
+    (setq ag-highlight-search t
+          ag-reuse-buffers t)))
+
 (use-package auto-complete
-  :ensure t
   :diminish auto-complete-mode
   :config
   (progn
-    (use-package go-autocomplete
-      :ensure t)
+    (use-package go-autocomplete)
+    (add-to-list 'ac-dictionary-directories (emacs-d "elpa/auto-complete-20131128.233/dict"))
     (setq ac-use-fuzzy t
           ac-disable-inline t
           ac-use-menu-map t
           ac-auto-show-menu t
           ac-auto-start t
           ac-ignore-case t
-          ac-candidate-menu-min 0)))
+          ac-candidate-menu-min 0)
+    (add-to-list 'ac-modes 'enh-ruby-mode)
+    (add-to-list 'ac-modes 'web-mode)
+    (add-to-list 'ac-modes 'go-mode)))
 
 (use-package diminish
-  :ensure t
   :config
   (progn
     (add-hook 'whitespace-mode-hook (lambda () (diminish 'whitespace-mode)))))
 
 (use-package evil
-  :ensure t
   :commands evil-mode)
 
 (use-package fiplr
-  :ensure t
   :bind ("s-t" . fiplr-find-file)
   :config
   (progn
@@ -81,7 +61,6 @@
                                (files ("*.jpg" "*.png" "*.zip" "*~"))))))
 
 (use-package flx
-  :ensure t
   :defer t
   :config
   (progn
@@ -89,34 +68,16 @@
     (setq ido-use-faces nil)
     (setq gc-cons-threshold 20000000)))
 
-(use-package edit-server
-  :ensure t
-  :if window-system
-  :init
-  (add-hook 'after-init-hook 'edit-server-start)
-  :config
-  (progn
-    (bind-key "C-c C-k" 'edit-server-abort edit-server-edit-mode-map)
-    (add-hook 'edit-server-start-hook
-              '(lambda ()
-                 (auto-fill-mode)
-                 (flyspell-mode)
-                 (set-fill-column 80)))))
-
 (use-package expand-region
-  :ensure t
   :bind ("C-=" . er/expand-region))
 
 (use-package github-browse-file
-  :ensure t
   :commands github-browse-file)
 
 (use-package gist
-  :ensure t
   :bind ("C-c C-g" . gist-region-or-buffer-private))
 
 (use-package flycheck
-  :ensure t
   :defer t
   :config
   (progn
@@ -126,15 +87,12 @@
     (set-face-background 'flycheck-warning "#D0BF8F")))
 
 (use-package go-mode
-  :ensure t
   :defer t)
 
 (use-package haml-mode
-  :ensure t
   :defer t)
 
 (use-package ido-ubiquitous
-  :ensure t
   :init
   ;; Fix ido-ubiquitous for newer packages
   (defmacro ido-ubiquitous-use-new-completing-read (cmd package)
@@ -144,78 +102,41 @@
             ad-do-it)))))
 
 (use-package markdown-mode
-  :ensure t
   :mode ("\\.\\(m\\(ark\\)?down\\|md\\)$" . markdown-mode)
   :config)
 
-(use-package powerline
-  :ensure t
+(use-package multi-term
+  :commands multi-term)
+
+(use-package multiple-cursors
+  :bind (("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-all-like-this)
+         ("C-c C-<" . mc/mark-previous-like-this)))
+
+(use-package powerline)
+
+(use-package projectile
+  :init (projectile-global-mode 1)
+  :bind (("s-p" . projectile-find-file)
+         ("s-b" . projectile-switch-to-buffer)
+         ("s-F" . projectile-ag))
   :config
   (progn
-    (custom-set-variables
-      '(powerline-default-separator 'arrow))
-    (setq powerline-arrow-shape 'arrow14)
-
-    ;; setup colors
-    (set-face-background 'mode-line "grey16")
-    (set-face-background 'mode-line-inactive "grey16")
-    (set-face-foreground 'powerline-active1 "#8FB28F")
-    (set-face-foreground 'powerline-active2 "#AFD8AF")
-
-    ;; modeline items
-    (setq display-time-default-load-average nil)
-    (display-time-mode 1)
-
-    ;; mode-line format
-    (setq-default mode-line-format
-                  '("%e"
-                    (:eval
-                     (let* ((active (powerline-selected-window-active))
-                            (mode-line (if active 'mode-line 'mode-line-inactive))
-                            (face1 (if active 'powerline-active1 'powerline-inactive1))
-                            (face2 (if active 'powerline-active2 'powerline-inactive2))
-                            (separator-left (intern (format "powerline-%s-%s"
-                                                            powerline-default-separator
-                                                            (car powerline-default-separator-dir))))
-                            (separator-right (intern (format "powerline-%s-%s"
-                                                             powerline-default-separator
-                                                             (cdr powerline-default-separator-dir))))
-                            (lhs (list
-                                       (powerline-raw mode-line-modified nil 'l)
-                                       (powerline-buffer-id nil 'l)
-                                       (when (and (boundp 'which-func-mode) which-func-mode)
-                                         (powerline-raw which-func-format nil 'l))
-                                       (powerline-raw " ")
-                                       (funcall separator-left mode-line face1)
-                                       (when (boundp 'erc-modified-channels-object)
-                                         (powerline-raw erc-modified-channels-object face1 'l))
-                                       (powerline-major-mode face1 'l)
-                                       (powerline-process face1)
-                                       (powerline-minor-modes face1 'l)
-                                       (powerline-narrow face1 'l)
-                                       (powerline-raw " " face1)
-                                       (funcall separator-left face1 face2)
-                                       (powerline-vc face2 'r)))
-                            (rhs (list (powerline-raw global-mode-string face2 'r)
-                                       (funcall separator-right face2 face1)
-                                       (powerline-raw "%4l" face1 'l)
-                                       (powerline-raw ":" face1 'l)
-                                       (powerline-raw "%3c" face1 'r)
-                                       (funcall separator-right face1 mode-line)
-                                       (powerline-raw " ")
-                                       (powerline-raw "%6p" nil 'r)
-                                       (powerline-hud face2 face1))))
-                       (concat (powerline-render lhs)
-                               (powerline-fill face2 (powerline-width rhs))
-                               (powerline-render rhs))))))))
+    (setq projectile-enable-caching t)
+    (setq projectile-require-project-root nil)
+    (setq projectile-completion-system 'grizzl)
+    (setq projectile-globally-ignored-files
+      (append projectile-globally-ignored-files
+      '(
+        ;; continuum import files
+        "*.cntmp" )))
+    (add-to-list 'projectile-globally-ignored-files ".DS_Store")))
 
 (use-package ruby-electric
-  :ensure t
   :defer t
   :diminish ruby-electric-mode)
 
 (use-package smex
-  :ensure t
   :defer t
   :bind (("M-x" . smex)
          ("M-X" . smex-major-mode-commands))
@@ -224,7 +145,6 @@
     (smex-initialize)))
 
 (use-package undo-tree
-  :ensure t
   :bind (("s-z" . undo-tree-undo)
          ("s-Z" . undo-tree-redo))
   :init
@@ -234,12 +154,4 @@
     ))
 
 (use-package yaml-mode
-  :ensure t
   :defer t)
-
-
-(use-package multiple-cursors
-  :ensure t
-  :bind (("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/mark-all-like-this)
-         ("C-c C-<" . mc/mark-previous-like-this)))
