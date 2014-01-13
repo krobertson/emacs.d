@@ -135,6 +135,14 @@
     (setq org-reveal-root (concat "file://" (emacs-d "vendor/reveal.js"))))
  :commands (org-reveal-export-to-html org-reveal-export-to-html-and-browse))
 
+(use-package ox-s5
+  :defer t
+  :init
+  (progn
+    (setq org-s5-ui-url (concat "file://" (emacs-d "vendor/s5/ui")))
+    (setq org-s5-theme "railscast"))
+  :commands (org-s5-export-to-html org-s5-export-as-html))
+
 (use-package powerline)
 
 (use-package projectile
