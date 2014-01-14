@@ -101,6 +101,9 @@
           (let ((ido-ubiquitous-enable-compatibility nil))
             ad-do-it)))))
 
+(use-package json-mode
+  :defer t)
+
 (use-package magit
   :init
   (progn

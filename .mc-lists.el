@@ -5,6 +5,7 @@
       '(
         cua-cut-region
         cua-delete-region
+        org-self-insert-command
         ))
 
 (setq mc/cmds-to-run-once

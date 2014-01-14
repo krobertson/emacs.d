@@ -114,3 +114,19 @@ the current position of point, then move it to the beginning of the line."
   (and (stringp docstring)
       (get-text-property 0 'dynamic-docstring-function docstring)))))
 
+(defun google ()
+  "Googles a query or region if any."
+  (interactive)
+  (browse-url
+   (concat
+    "http://www.google.com/search?ie=utf-8&oe=utf-8&q="
+    (if (region-active-p)
+        (buffer-substring (region-beginning) (region-end))
+      (read-string "Query: ")))))
+
+;;; Stefan Monnier <foo at acm.org>. It is the opposite of fill-paragraph
+(defun unfill-paragraph ()
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))

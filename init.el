@@ -60,6 +60,12 @@
       auto-save-list-file-prefix nil
       create-lockfiles nil)
 
+;; Do not ask for confirmation
+(setq confirm-nonexistent-file-or-buffer nil)
+
+;; Do not show annoying menu-bar tips
+(setq suggest-key-bindings nil)
+
 ;; ido
 (ido-mode 1)
 (ido-everywhere 1)
@@ -93,6 +99,7 @@
         mac-command-modifier 'super
         mac-allow-anti-aliasing t
         delete-by-moving-to-trash t
+        browse-url-browser-function 'browse-url-default-macosx-browser
         trash-directory (expand-file-name ".Trash" (getenv "HOME"))))
 
 ;; whitespace
@@ -158,6 +165,9 @@
 (add-to-list 'load-path (emacs-d "vendor"))
 (load (emacs-d "vendor/jekyll"))
 (load (emacs-d "vendor/linum+"))
+;; window numbering
+(load (emacs-d "vendor/window_numbering"))
+(window-numbering-mode 1)
 
 ;; custom functions
 (load (emacs-d "functions"))

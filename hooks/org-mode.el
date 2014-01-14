@@ -6,3 +6,6 @@
 
 (require 'ox-confluence)
 (require 'ox-html)
+
+;; always use auto-fill-mode in org-mode
+(auto-fill-mode t)

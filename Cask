@@ -18,6 +18,7 @@
 (depends-on "go-mode")
 (depends-on "haml-mode")
 (depends-on "ido-ubiquitous")
+(depends-on "json-mode")
 (depends-on "magit")
 (depends-on "markdown-mode")
 (depends-on "multi-term")
@@ -29,4 +30,3 @@
 (depends-on "undo-tree")
 (depends-on "use-package")
 (depends-on "yaml-mode")
-;(depends-on "ruby-electric")
