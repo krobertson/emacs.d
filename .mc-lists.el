@@ -5,7 +5,11 @@
       '(
         cua-cut-region
         cua-delete-region
+        cua-paste
+        go-mode-insert-and-indent
         org-self-insert-command
+        ruby-end-space
+        smart-line-beginning
         ))
 
 (setq mc/cmds-to-run-once

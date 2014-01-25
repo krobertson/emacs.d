@@ -6,7 +6,7 @@
 (cask-initialize)
 
 ;; window size
-(setq default-frame-alist '((font . "SauceCodePowerline-Regular-12")
+(setq default-frame-alist '((font . "Source Code Pro for Powerline-12")
                             (width . 190)
                             (height . 60)))
 
@@ -153,6 +153,9 @@
 ;; external packages
 (load (emacs-d "packages"))
 
+;; intialize environment variables from the shell
+(exec-path-from-shell-initialize)
+
 ;; -- load everything from dotfiles-init-dir ---------------------------------
 (setq init-file (or load-file-name buffer-file-name))
 (setq dotfiles-dir (file-name-directory init-file))
@@ -168,6 +171,9 @@
 ;; window numbering
 (load (emacs-d "vendor/window_numbering"))
 (window-numbering-mode 1)
+;; folding mode
+(load (emacs-d "vendor/folding"))
+(folding-mode-add-find-file-hook)
 
 ;; custom functions
 (load (emacs-d "functions"))

@@ -1,6 +1,7 @@
 (source melpa)
 
 (depends-on "ace-jump-mode")
+(depends-on "lua-mode")
 (depends-on "ag")
 (depends-on "auto-complete")
 (depends-on "cask")

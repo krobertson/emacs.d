@@ -6,19 +6,20 @@
 
 (when is-mac
   (use-package exec-path-from-shell
+    :commands exec-path-from-shell-initialize
     :init
     (progn
-      (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
-        (add-to-list 'exec-path-from-shell-variables var)))
-    :config
-    (progn
-      (exec-path-from-shell-initialize))))
+      (dolist (var '("PATH" "GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
+        (add-to-list 'exec-path-from-shell-variables var)))))
 
 (use-package ace-jump-mode
   :bind ("C-c SPC" . ace-jump-mode)
   :init
   (progn
     (require 'cl)))
+
+(use-package lua-mode
+  :defer t)
 
 (use-package ag
   :commands (ag ag-files ag-regexp ag-project ag-project-files ag-project-regexp)
