@@ -6,7 +6,7 @@
 (cask-initialize)
 
 ;; window size
-(setq default-frame-alist '((font . "Source Code Pro for Powerline-12")
+(setq default-frame-alist '((font . "Source Code Pro for Powerline-10")
                             (width . 190)
                             (height . 60)))
 
@@ -28,6 +28,9 @@
 (setq-default cursor-in-non-selected-windows 'hollow)
 (blink-cursor-mode t)
 (setq-default blink-matching-paren t)
+
+;; mouse
+(setq mouse-wheel-scroll-amount '(0.001))
 
 ;; cua mode
 (cua-mode t)
@@ -88,11 +91,6 @@
   (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
 (add-hook 'ido-setup-hook 'ido-define-keys)
 
-;; Are we on a mac?
-(setq is-mac (equal system-type 'darwin))
-(when is-mac
-  (setq mouse-wheel-scroll-amount '(0.001)))
-
 ;; os x
 (when (string= system-type "darwin")
   (setq mac-option-modifier 'meta
@@ -152,9 +150,6 @@
 
 ;; external packages
 (load (emacs-d "packages"))
-
-;; intialize environment variables from the shell
-(exec-path-from-shell-initialize)
 
 ;; -- load everything from dotfiles-init-dir ---------------------------------
 (setq init-file (or load-file-name buffer-file-name))
