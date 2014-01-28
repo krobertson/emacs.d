@@ -5,3 +5,7 @@ eshell
 tramp
 *.elc
 var
+bookmarks
+.cask
+projectile-bookmarks.eld
+projectile.cache
