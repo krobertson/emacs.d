@@ -106,7 +106,7 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; autofill
-(set-fill-column 80)
+(setq-default fill-column 80)
 
 ;; highlight matching parenthesis
 (setq show-paren-style 'parenthesis)
