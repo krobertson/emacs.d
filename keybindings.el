@@ -8,8 +8,7 @@
 (global-set-key (kbd "s-n")       'new-frame)
 (global-set-key (kbd "s-v")       'yank)
 (global-set-key (kbd "s-c")       'kill-ring-save)
-(global-set-key (kbd "s-f")       'isearch-forward)
-(global-set-key (kbd "s-g")       'isearch-repeat-forward)
+
 (global-set-key (kbd "s-x")       'kill-region)
 (global-set-key (kbd "s-a")       'mark-whole-buffer)
 (global-set-key (kbd "s-<left>")  'smart-line-beginning)
@@ -23,6 +22,10 @@
 (global-set-key (kbd "C-k")          'kr-delete-line)
 (global-set-key (kbd "<C-return>")   'open-line-below)
 (global-set-key (kbd "<C-S-return>") 'open-line-above)
+
+;; searching
+(global-set-key (kbd "C-f")       'isearch-forward)
+(global-set-key (kbd "s-f")       'isearch-repeat-forward)
 
 ;; navigation
 (global-set-key [C-tab] 'other-window)

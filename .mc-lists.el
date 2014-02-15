@@ -3,9 +3,11 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        cua--prefix-override-handler
         cua-cut-region
         cua-delete-region
         cua-paste
+        enh-ruby-electric-brace
         go-mode-insert-and-indent
         org-self-insert-command
         ruby-end-space
@@ -15,4 +17,7 @@
 (setq mc/cmds-to-run-once
       '(
         describe-key
+        end-of-buffer
+        ido-switch-buffer
+        mouse-set-region
         ))

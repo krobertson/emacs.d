@@ -130,3 +130,13 @@ the current position of point, then move it to the beginning of the line."
   (interactive)
   (let ((fill-column (point-max)))
     (fill-paragraph nil)))
+
+;; Sorts the words within a selected region.
+(defun sort-words (reverse beg end)
+  "Sort words in region alphabetically, in REVERSE if negative.
+  Prefixed with negative \\[universal-argument], sorts in reverse.
+  The variable `sort-fold-case' determines whether alphabetic case
+  affects the sort order.
+  See `sort-regexp-fields'."
+    (interactive "*P\nr")
+    (sort-regexp-fields reverse "\\w+" "\\&" beg end))
