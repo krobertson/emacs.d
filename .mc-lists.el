@@ -11,13 +11,19 @@
         go-mode-insert-and-indent
         org-self-insert-command
         ruby-end-space
+        sgml-slash
+        sh-assignment
         smart-line-beginning
         ))
 
 (setq mc/cmds-to-run-once
       '(
+        beginning-of-buffer
         describe-key
         end-of-buffer
+        ido-find-file
         ido-switch-buffer
+        markdown-exdent-or-delete
         mouse-set-region
+        smex
         ))

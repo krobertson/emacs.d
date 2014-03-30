@@ -5,7 +5,7 @@
 
 (setq org-directory "~/Dropbox/org")
 (setq org-default-notes-file (concat org-directory "/personal.org"))
-(setq org-agenda-files (concat org-directory "/personal.org"))
+(setq org-agenda-files (concat org-directory "/*.org"))
 (setq org-mobile-inbox-for-pull (concat org-directory "/flagged.org"))
 (setq org-mobile-directory (concat org-directory "/MobileOrg"))
 
@@ -39,6 +39,8 @@
 (setq org-capture-templates
   '(("t" "Todo" entry (file+headline (concat org-directory "/personal.org") "Tasks")
       "** TODO %?\n  %i\n  %a")
+    ("tl" "Todo w/ Link" entry (file+headline (concat org-directory "/personal.org") "Tasks")
+      "** TODO %?\n  %i\n  %a")
     ("n" "Note" entry (file+datetree (concat org-directory "/notes.org") "Notes")
       "* %U %?\n  %i\n  %a")
     ("j" "Journal" entry (file+datetree "~/org/journal.org")
@@ -46,4 +48,4 @@
 
 ;; reset org-mode's Control-tab to cycle windows. Was org-force-cycle-archived
 (define-key org-mode-map [C-tab] 'other-window)
-(define-key org-mode-map (kbd "s-<return>") 'kr-org-insert-bullet)
+(define-key org-mode-map (kbd "S-s-<return>") 'kr-org-insert-bullet)
