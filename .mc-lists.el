@@ -9,6 +9,7 @@
         cua-paste
         enh-ruby-electric-brace
         go-mode-insert-and-indent
+        indent-for-tab-command
         org-self-insert-command
         ruby-end-space
         sgml-slash
