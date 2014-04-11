@@ -15,6 +15,7 @@
         sgml-slash
         sh-assignment
         smart-line-beginning
+        markdown-exdent-or-delete
         ))
 
 (setq mc/cmds-to-run-once
@@ -24,7 +25,6 @@
         end-of-buffer
         ido-find-file
         ido-switch-buffer
-        markdown-exdent-or-delete
         mouse-set-region
         smex
         ))
