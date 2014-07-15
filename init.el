@@ -179,6 +179,10 @@
 (setq jekyll-post-ext ".md"
       jekyll-directory (expand-file-name "~/blog/"))
 
+;; configure browse-url to use google-chrome
+(setq browse-url-browser-function 'browse-url-chromium
+      browse-url-chromium-program "google-chrome")
+
 ;; emacs server
 (require 'server)
 (unless (server-running-p)
