@@ -35,7 +35,11 @@
           ac-candidate-menu-min 0)
     (add-to-list 'ac-modes 'enh-ruby-mode)
     (add-to-list 'ac-modes 'web-mode)
-    (add-to-list 'ac-modes 'go-mode)))
+    (add-to-list 'ac-modes 'go-mode)
+    (add-to-list 'ac-modes 'clojure-mode)))
+
+(use-package clojure-mode
+  :defer t)
 
 (use-package diminish
   :config
@@ -104,6 +108,9 @@
             ad-do-it)))))
 
 (use-package json-mode
+  :defer t)
+
+(use-package js2-mode
   :defer t)
 
 (use-package magit
