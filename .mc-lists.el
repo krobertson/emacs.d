@@ -3,6 +3,8 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        c-electric-paren
+        c-electric-semi&comma
         cua--prefix-override-handler
         cua-cut-region
         cua-delete-region
@@ -10,12 +12,13 @@
         enh-ruby-electric-brace
         go-mode-insert-and-indent
         indent-for-tab-command
+        markdown-exdent-or-delete
         org-self-insert-command
         ruby-end-space
         sgml-slash
         sh-assignment
         smart-line-beginning
-        markdown-exdent-or-delete
+        smart-move-line-beginning
         ))
 
 (setq mc/cmds-to-run-once
