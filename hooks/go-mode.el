@@ -12,11 +12,4 @@
 (add-hook 'before-save-hook 'gofmt-before-save)
 
 ;; enable flycheck mode
-;(load (concat (getenv "GOPATH") "/src/github.com/dougm/goflymake/go-flycheck"))
-(flycheck-declare-checker go-fmt
-      "A Go syntax and style checker using the gofmt utility."
-      :command '("gofmt" source-inplace)
-      :error-patterns '(("^\\(?1:.*\\):\\(?2:[0-9]+\\):\\(?3:[0-9]+\\): \\(?4:.*\\)$" error))
-      :modes 'go-mode)
-(add-to-list 'flycheck-checkers 'go-gofmt)
 (flycheck-mode)
