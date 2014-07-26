@@ -100,6 +100,11 @@
         browse-url-browser-function 'browse-url-default-macosx-browser
         trash-directory (expand-file-name ".Trash" (getenv "HOME"))))
 
+;; linux specific
+(when (string= system-type "linux")
+  (setq browse-url-browser-function 'browse-url-chromium
+        browse-url-chromium-program "google-chrome"))
+
 ;; whitespace
 (setq whitespace-line-column 120)
 (setq whitespace-style '(face lines-tail))
@@ -178,10 +183,6 @@
 ;; configure jekyll blog
 (setq jekyll-post-ext ".md"
       jekyll-directory (expand-file-name "~/blog/"))
-
-;; configure browse-url to use google-chrome
-(setq browse-url-browser-function 'browse-url-chromium
-      browse-url-chromium-program "google-chrome")
 
 ;; emacs server
 (require 'server)

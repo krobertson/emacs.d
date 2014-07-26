@@ -158,7 +158,7 @@
 (use-package powerline)
 
 (use-package projectile
-  :init (projectile-global-mode 1)
+  ;;:init (projectile-global-mode 1)
   :bind (("s-p" . projectile-find-file)
          ("s-b" . projectile-switch-to-buffer)
          ("s-F" . projectile-ag))
