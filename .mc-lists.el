@@ -11,6 +11,7 @@
         cua-paste
         enh-ruby-electric-brace
         go-mode-insert-and-indent
+        haml-electric-backspace
         indent-for-tab-command
         markdown-exdent-or-delete
         org-self-insert-command
