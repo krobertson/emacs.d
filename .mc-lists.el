@@ -13,6 +13,7 @@
         go-mode-insert-and-indent
         haml-electric-backspace
         indent-for-tab-command
+        ledger-post-align-xact
         markdown-exdent-or-delete
         org-self-insert-command
         ruby-end-space

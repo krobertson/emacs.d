@@ -45,3 +45,7 @@
 (define-key minibuffer-local-completion-map (kbd "C-v")      'cua-paste)
 (define-key minibuffer-local-completion-map (kbd "s-<left>") 'move-beginning-of-line)
 (define-key minibuffer-local-completion-map (kbd "<home>")   'beginning-of-line)
+
+;; Scale font settings
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
