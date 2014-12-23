@@ -1,1 +1,2 @@
 (whitespace-mode)
+(pandoc-mode)

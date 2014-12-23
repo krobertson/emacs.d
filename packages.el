@@ -155,6 +155,9 @@
     (setq org-s5-theme "railscast"))
   :commands (org-s5-export-to-html org-s5-export-as-html))
 
+(use-package pandoc-mode
+  :defer t)
+
 (use-package powerline)
 
 (use-package projectile

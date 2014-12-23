@@ -26,6 +26,7 @@
 (depends-on "markdown-mode")
 (depends-on "multi-term")
 (depends-on "multiple-cursors")
+(depends-on "pandoc-mode")
 (depends-on "powerline")
 (depends-on "projectile")
 (depends-on "ruby-end")
