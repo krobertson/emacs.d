@@ -215,7 +215,10 @@ Here are the keyword-value pair allows in `org-feed-alist'.
 (defcustom org-feed-drawer "FEEDSTATUS"
   "The name of the drawer for feed status information.
 Each feed may also specify its own drawer name using the `:drawer'
-parameter in `org-feed-alist'."
+parameter in `org-feed-alist'.
+Note that in order to make these drawers behave like drawers, they must
+be added to the variable `org-drawers' or configured with a #+DRAWERS
+line."
   :group 'org-feed
   :type '(string :tag "Drawer Name"))
 

@@ -1368,12 +1368,10 @@ decides which time to use."
       (current-time))
      ((equal cmt "today")
       (setq org--msg-extra "showing today's task time.")
-      (let* ((dt (decode-time (current-time)))
-	     (hour (nth 2 dt))
-	     (day (nth 3 dt)))
-	(if (< hour org-extend-today-until) (setf (nth 3 dt) (1- day)))
-	(setf (nth 2 dt) org-extend-today-until)
-	(setq dt (append (list 0 0) (nthcdr 2 dt)))
+      (let* ((dt (decode-time (current-time))))
+	(setq dt (append (list 0 0 0) (nthcdr 3 dt)))
+	(if org-extend-today-until
+	    (setf (nth 2 dt) org-extend-today-until))
 	(apply 'encode-time dt)))
      ((or (equal cmt "all")
 	  (and (or (not cmt) (equal cmt "auto"))
@@ -1589,7 +1587,7 @@ to, overriding the existing value of `org-clock-out-switch-to-state'."
 	(while (and (< (point) end)
 		    (search-forward clock-drawer end t))
 	  (goto-char (match-beginning 0))
-	  (org-remove-empty-drawer-at (point))
+	  (org-remove-empty-drawer-at clock-drawer (point))
 	  (forward-line 1))))))
 
 (defun org-clock-timestamps-up (&optional n)
@@ -1653,12 +1651,12 @@ Optional argument N tells to change by that many units."
     (setq frame-title-format org-frame-title-format-backup)
     (force-mode-line-update)
     (error "No active clock"))
-  (save-excursion    ; Do not replace this with `with-current-buffer'.
+  (save-excursion ; Do not replace this with `with-current-buffer'.
     (org-no-warnings (set-buffer (org-clocking-buffer)))
     (goto-char org-clock-marker)
     (if (org-looking-back (concat "^[ \t]*" org-clock-string ".*"))
 	(progn (delete-region (1- (point-at-bol)) (point-at-eol))
-	       (org-remove-empty-drawer-at (point)))
+	       (org-remove-empty-drawer-at "LOGBOOK" (point)))
       (message "Clock gone, cancel the timer anyway")
       (sit-for 2)))
   (move-marker org-clock-marker nil)
@@ -1840,9 +1838,9 @@ Use \\[org-clock-remove-overlays] to remove the subtree times."
 	(when org-remove-highlights-with-change
 	  (org-add-hook 'before-change-functions 'org-clock-remove-overlays
 			nil 'local))))
-      (message (concat "Total file time: "
-		       (org-minutes-to-clocksum-string org-clock-file-total-minutes)
-		       " (%d hours and %d minutes)") h m)))
+    (message (concat "Total file time: "
+		     (org-minutes-to-clocksum-string org-clock-file-total-minutes)
+		     " (%d hours and %d minutes)") h m)))
 
 (defvar org-clock-overlays nil)
 (make-variable-buffer-local 'org-clock-overlays)
@@ -1852,16 +1850,17 @@ Use \\[org-clock-remove-overlays] to remove the subtree times."
 If LEVEL is given, prefix time with a corresponding number of stars.
 This creates a new overlay and stores it in `org-clock-overlays', so that it
 will be easy to remove."
-  (let* ((c 60) (h (floor (/ time 60))) (m (- time (* 60 h)))
-	 (l (if level (org-get-valid-level level 0) 0))
-	 (off 0)
+  (let* ((l (if level (org-get-valid-level level 0) 0))
 	 ov tx)
-    (org-move-to-column c)
-    (unless (eolp) (skip-chars-backward "^ \t"))
-    (skip-chars-backward " \t")
-    (setq ov (make-overlay (point-at-bol) (point-at-eol))
-    	  tx (concat (buffer-substring (point-at-bol) (point))
-		     (make-string (+ off (max 0 (- c (current-column)))) ?.)
+    (beginning-of-line)
+    (when (looking-at org-complex-heading-regexp)
+      (goto-char (match-beginning 4)))
+    (setq ov (make-overlay (point) (point-at-eol))
+    	  tx (concat (buffer-substring-no-properties (point) (match-end 4))
+		     (make-string
+		      (max 0 (- (- 60 (current-column))
+				(- (match-end 4) (match-beginning 4))
+				(length (org-get-at-bol 'line-prefix)))) ?.)
 		     (org-add-props (concat (make-string l ?*) " "
 					    (org-minutes-to-clocksum-string time)
 					    (make-string (- 16 l) ?\ ))
@@ -2557,13 +2556,10 @@ from the dynamic block definition."
     total-time))
 
 (defun org-clocktable-indent-string (level)
-  (if (= level 1)
-      ""
-    (let ((str "\\__"))
-      (while (> level 2)
-	(setq level (1- level)
-	      str (concat str "___")))
-      (concat str " "))))
+  (if (= level 1) ""
+    (let ((str " "))
+      (dotimes (k (1- level) str)
+	(setq str (concat "\\emsp" str))))))
 
 (defun org-clocktable-steps (params)
   "Step through the range to make a number of clock tables."
@@ -2707,9 +2703,13 @@ TIME:      The sum of all time spend in this tree, in minutes.  This time
 			   (format "file:%s::%s"
 				   (buffer-file-name)
 				   (save-match-data
-				     (org-make-org-heading-search-string
-				      (match-string 2))))
-			   (match-string 2)))
+				     (match-string 2)))
+			   (org-make-org-heading-search-string
+			    (replace-regexp-in-string
+			     org-bracket-link-regexp
+			     (lambda (m) (or (match-string 3 m)
+					     (match-string 1 m)))
+			     (match-string 2)))))
 		    tsp (when timestamp
 			  (setq props (org-entry-properties (point)))
 			  (or (cdr (assoc "SCHEDULED" props))

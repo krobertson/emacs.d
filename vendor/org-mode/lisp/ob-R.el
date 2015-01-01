@@ -37,7 +37,6 @@
 (declare-function ess-eval-buffer "ext:ess-inf" (vis))
 (declare-function org-number-sequence "org-compat" (from &optional to inc))
 (declare-function org-remove-if-not "org" (predicate seq))
-(declare-function org-every "org" (pred seq))
 
 (defconst org-babel-header-args:R
   '((width		 . :any)
@@ -66,20 +65,7 @@
 			    (output value graphics))))
   "R-specific header arguments.")
 
-(defconst ob-R-safe-header-args
-  (append org-babel-safe-header-args
-	  '(:width :height :bg :units :pointsize :antialias :quality
-		   :compression :res :type :family :title :fonts
-		   :version :paper :encoding :pagecentre :colormodel
-		   :useDingbats :horizontal))
-  "Header args which are safe for R babel blocks.
-
-See `org-babel-safe-header-args' for documentation of the format of
-this variable.")
-
 (defvar org-babel-default-header-args:R '())
-(put 'org-babel-default-header-args:R 'safe-local-variable
-     (org-babel-header-args-safe-fn ob-R-safe-header-args))
 
 (defcustom org-babel-R-command "R --slave --no-save"
   "Name of command to use for executing R code."
@@ -187,12 +173,11 @@ This function is called by `org-babel-execute-src-block'."
 (defun org-babel-R-assign-elisp (name value colnames-p rownames-p)
   "Construct R code assigning the elisp VALUE to a variable named NAME."
   (if (listp value)
-      (let ((max (apply #'max (mapcar #'length (org-remove-if-not
-						#'sequencep value))))
-	    (min (apply #'min (mapcar #'length (org-remove-if-not
-						#'sequencep value))))
-	    (transition-file (org-babel-temp-file "R-import-")))
-        ;; ensure VALUE has an orgtbl structure (depth of at least 2)
+      (let* ((lengths (mapcar 'length (org-remove-if-not 'sequencep value)))
+	     (max (if lengths (apply 'max lengths) 0))
+	     (min (if lengths (apply 'min lengths) 0))
+	     (transition-file (org-babel-temp-file "R-import-")))
+        ;; Ensure VALUE has an orgtbl structure (depth of at least 2).
         (unless (listp (car value)) (setq value (list value)))
         (with-temp-file transition-file
           (insert

@@ -547,9 +547,7 @@ following values:
 
 '(4)     Use the comma as a field separator
 '(16)    Use a TAB as field separator
-'(64)    Prompt for a regular expression as field separator
 integer  When a number, use that many spaces as field separator
-regexp   When a regular expression, use it to match the separator
 nil      When nil, the command tries to be smart and figure out the
          separator in the following way:
          - when each line contains a TAB, assume TAB-separated material
@@ -559,8 +557,6 @@ nil      When nil, the command tries to be smart and figure out the
   (let* ((beg (min beg0 end0))
 	 (end (max beg0 end0))
 	 re)
-    (if (equal separator '(64))
-	(setq separator (read-regexp "Regexp for field separator")))
     (goto-char beg)
     (beginning-of-line 1)
     (setq beg (point-marker))
@@ -595,8 +591,6 @@ nil      When nil, the command tries to be smart and figure out the
 		 (if (< separator 1)
 		     (user-error "Number of spaces in separator must be >= 1")
 		   (format "^ *\\| *\t *\\| \\{%d,\\}" separator)))
-		((stringp separator)
-		 (format "^ *\\|%s" separator))
 		(t (error "This should not happen"))))
       (while (re-search-forward re end t)
 	(replace-match "| " t t)))
@@ -1247,6 +1241,7 @@ is always the old value."
 (defun org-table-field-info (arg)
   "Show info about the current field, and highlight any reference at point."
   (interactive "P")
+  (unless (org-at-table-p) (user-error "Not at a table"))
   (org-table-get-specials)
   (save-excursion
     (let* ((pos (point))
@@ -1837,7 +1832,7 @@ blindly applies a recipe that works for simple tables."
 	  (goto-char beg)))))
 
 (defun org-table-transpose-table-at-point ()
-  "Transpose Org table at point and eliminate hlines.
+  "Transpose orgmode table at point and eliminate hlines.
 So a table like
 
 | 1 | 2 | 4 | 5 |
@@ -1852,11 +1847,9 @@ will be transposed as
 | 4 | c | g |
 | 5 | d | h |
 
-Note that horizontal lines disappear."
+Note that horizontal lines disappeared."
   (interactive)
   (let* ((table (delete 'hline (org-table-to-lisp)))
-	 (dline_old (org-table-current-line))
-	 (col_old (org-table-current-column))
 	 (contents (mapcar (lambda (p)
 			     (let ((tp table))
 			       (mapcar
@@ -1866,17 +1859,10 @@ Note that horizontal lines disappear."
 				    (setq tp (cdr tp))))
 				table)))
 			   (car table))))
-    (goto-char (org-table-begin))
-    (re-search-forward "|")
-    (backward-char)
-    (delete-region (point) (org-table-end))
-    (insert (mapconcat
-	     (lambda(x)
-	       (concat "| " (mapconcat 'identity x " | " ) "  |\n" ))
-	     contents ""))
-    (org-table-goto-line col_old)
-    (org-table-goto-column dline_old))
-  (org-table-align))
+    (delete-region (org-table-begin) (org-table-end))
+    (insert (mapconcat (lambda(x) (concat "| " (mapconcat 'identity x " | " ) "  |\n" ))
+                       contents ""))
+    (org-table-align)))
 
 ;;;###autoload
 (defun org-table-wrap-region (arg)
@@ -2657,7 +2643,6 @@ not overwrite the stored one."
 	;; Check for old vertical references
 	(setq form (org-table-rewrite-old-row-references form))
 	;; Insert remote references
-	(setq form (org-table-remote-reference-indirection form))
 	(while (string-match "\\<remote([ \t]*\\([-_a-zA-Z0-9]+\\)[ \t]*,[ \t]*\\([^\n)]+\\))" form)
 	  (setq form
 		(replace-match
@@ -2727,7 +2712,8 @@ not overwrite the stored one."
 	  (or (fboundp 'calc-eval)
 	      (user-error "Calc does not seem to be installed, and is needed to evaluate the formula"))
 	  ;; Use <...> time-stamps so that Calc can handle them
-	  (setq form (replace-regexp-in-string org-ts-regexp3 "<\\1>" form))
+	  (while (string-match (concat "\\[" org-ts-regexp1 "\\]") form)
+	    (setq form (replace-match "<\\1>" nil nil form)))
 	  ;; I18n-ize local time-stamps by setting (system-time-locale "C")
 	  (when (string-match org-ts-regexp2 form)
 	    (let* ((ts (match-string 0 form))
@@ -3022,8 +3008,6 @@ known that the table will be realigned a little later anyway."
       ;; Insert constants in all formulas
       (setq eqlist
 	    (mapcar (lambda (x)
-		      (if (string-match "^@-?I+" (car x))
-			  (user-error "Can't assign to hline relative reference"))
 		      (when (string-match "\\`$[<>]" (car x))
 			(setq lhs1 (car x))
 			(setq x (cons (substring
@@ -3879,9 +3863,10 @@ With prefix ARG, apply the new formulas to the table."
 	(push org-table-current-begin-pos org-show-positions)
 	(let ((min (apply 'min org-show-positions))
 	      (max (apply 'max org-show-positions)))
-	  (goto-char min) (recenter 0)
+	  (set-window-start (selected-window) min)
 	  (goto-char max)
-	  (or (pos-visible-in-window-p max) (recenter -1))))
+	  (or (pos-visible-in-window-p max)
+	      (set-window-start (selected-window) max))))
       (select-window win))))
 
 (defun org-table-force-dataline ()
@@ -5010,33 +4995,6 @@ list of the fields in the rectangle."
 		    (save-match-data
 		      (org-table-get-range (match-string 0 form) tbeg 1))
 		  form)))))))))
-
-(defun org-table-remote-reference-indirection (form)
-  "Return formula with table remote references substituted by indirection.
-For example \"remote($1, @>$2)\" => \"remote(year_2013, @>$1)\".
-This indirection works only with the format @ROW$COLUMN.  The
-format \"B3\" is not supported because it can not be
-distinguished from a plain table name or ID."
-  (let ((start 0))
-    (while (string-match (concat
-			  ;; Same as in `org-table-eval-formula'.
-			  "\\<remote([ \t]*\\("
-			  ;; Allow "$1", "@<", "$-1", "@<<$1" etc.
-			  "[@$][^,)]+"
-			  ;; Same as in `org-table-eval-formula'.
-			  "\\)[ \t]*,[ \t]*\\([^\n)]+\\))")
-			 form
-			 start)
-      (setq start (match-end 0))
-      ;; Substitute the remote reference with the value found in the
-      ;; field.
-      (setq form
-	    (replace-match
-	     (save-match-data
-	       (org-table-get-range (org-table-formula-handle-first/last-rc
-				     (match-string 1 form))))
-	     t t form 1))))
-  form)
 
 (defmacro org-define-lookup-function (mode)
   (let ((mode-str (symbol-name mode))

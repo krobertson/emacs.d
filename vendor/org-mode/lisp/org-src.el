@@ -348,7 +348,7 @@ the display of windows containing the Org buffer and the code buffer."
 	  (condition-case e
 	      (funcall lang-f)
 	    (error
-	     (error "Language mode `%s' fails with: %S" lang-f (nth 1 e)))))
+	     (message "Language mode `%s' fails with: %S" lang-f (nth 1 e)))))
 	(dolist (pair transmitted-variables)
 	  (org-set-local (car pair) (cadr pair)))
 	;; Remove protecting commas from visible part of buffer.
@@ -376,23 +376,21 @@ the display of windows containing the Org buffer and the code buffer."
 	  (when (fboundp edit-prep-func)
 	    (funcall edit-prep-func full-info)))
 	(or org-edit-src-code-timer
+	    (zerop org-edit-src-auto-save-idle-delay)
 	    (setq org-edit-src-code-timer
-		  (unless (zerop org-edit-src-auto-save-idle-delay)
-		    (run-with-idle-timer
-		     org-edit-src-auto-save-idle-delay t
-		     (lambda ()
-		       (cond
-			((and (string-match "\*Org Src" (buffer-name))
-			      (buffer-modified-p))
-			 (org-edit-src-save))
-			((not
-			  (delq nil (mapcar
-				     (lambda (b)
-				       (string-match "\*Org Src" (buffer-name b)))
-				     (buffer-list))))
-			 (cancel-timer org-edit-src-code-timer)
-			 (setq org-edit-src-code-timer)))))))))
-	t)))
+		  (run-with-idle-timer
+		   org-edit-src-auto-save-idle-delay t
+		   (lambda ()
+		     (cond
+		      ((org-string-match-p "\\`\\*Org Src" (buffer-name))
+		       (when (buffer-modified-p) (org-edit-src-save)))
+		      ((not (org-some (lambda (b)
+					(org-string-match-p "\\`\\*Org Src"
+							    (buffer-name b)))
+				      (buffer-list)))
+		       (cancel-timer org-edit-src-code-timer)
+		       (setq org-edit-src-code-timer nil))))))))
+      t)))
 
 (defun org-edit-src-continue (e)
   "Continue editing source blocks." ;; Fixme: be more accurate
@@ -577,14 +575,6 @@ the language, a switch telling if the content should be in a single line."
 	(pos (point))
 	re1 re2 single beg end lang lfmt match-re1 ind entry)
     (catch 'exit
-      (when (org-at-table.el-p)
-	(re-search-backward "^[\t]*[^ \t|\\+]" nil t)
-	(setq beg (1+ (point-at-eol)))
-	(goto-char beg)
-	(or (re-search-forward "^[\t]*[^ \t|\\+]" nil t)
-	    (progn (goto-char (point-max)) (newline)))
-	(setq end (1- (point-at-bol)))
-	(throw 'exit (list beg end 'table.el nil nil 0)))
       (while (setq entry (pop re-list))
 	(setq re1 (car entry) re2 (nth 1 entry) lang (nth 2 entry)
 	      single (nth 3 entry))
@@ -615,7 +605,15 @@ the language, a switch telling if the content should be in a single line."
 			(throw 'exit
 			       (list (match-end 0) end
 				     (org-edit-src-get-lang lang)
-				     single lfmt ind))))))))))))
+				     single lfmt ind)))))))))
+      (when (org-at-table.el-p)
+	(re-search-backward "^[\t]*[^ \t|\\+]" nil t)
+	(setq beg (1+ (point-at-eol)))
+	(goto-char beg)
+	(or (re-search-forward "^[\t]*[^ \t|\\+]" nil t)
+	    (progn (goto-char (point-max)) (newline)))
+	(setq end (1- (point-at-bol)))
+	(throw 'exit (list beg end 'table.el nil nil 0))))))
 
 (defun org-edit-src-get-lang (lang)
   "Extract the src language."
@@ -737,8 +735,8 @@ with \",*\", \",#+\", \",,*\" and \",,#+\"."
       (unless (or single preserve-indentation (= total-nindent 0))
 	(setq indent (make-string total-nindent ?\ ))
 	(goto-char (point-min))
-	(while (re-search-forward "^" nil t)
-	  (replace-match indent)))
+	(while (re-search-forward "\\(^\\).+" nil t)
+	  (replace-match indent nil nil nil 1)))
       (if (org-bound-and-true-p org-edit-src-picture)
 	  (setq total-nindent (+ total-nindent 2)))
       (setq code (buffer-string))
@@ -757,8 +755,8 @@ with \",*\", \",#+\", \",,*\" and \",,#+\"."
       (delete-region beg (max beg end))
       (unless (string-match "\\`[ \t]*\\'" code)
 	(insert code))
-      	;; Make sure the overlay stays in place
-	(when (eq context 'save) (move-overlay ovl beg (point)))
+      ;; Make sure the overlay stays in place
+      (when (eq context 'save) (move-overlay ovl beg (point)))
       (goto-char beg)
       (if single (just-one-space)))
     (if (memq t (mapcar (lambda (overlay)
@@ -774,9 +772,6 @@ with \",*\", \",#+\", \",,*\" and \",,#+\"."
     (unless (eq context 'save)
       (move-marker beg nil)
       (move-marker end nil)))
-  (when org-edit-src-code-timer
-    (cancel-timer org-edit-src-code-timer)
-    (setq org-edit-src-code-timer nil))
   (unless (eq context 'save)
     (when org-edit-src-saved-temp-window-config
       (set-window-configuration org-edit-src-saved-temp-window-config)

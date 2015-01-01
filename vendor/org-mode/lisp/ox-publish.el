@@ -54,12 +54,6 @@
   "This will cache timestamps and titles for files in publishing projects.
 Blocks could hash sha1 values here.")
 
-(defvar org-publish-after-publishing-hook nil
-  "Hook run each time a file is published.
-Every function in this hook will be called with two arguments:
-the name of the original file and the name of the file
-produced.")
-
 (defgroup org-publish nil
   "Options for publishing a set of Org-mode and related files."
   :tag "Org Publishing"
@@ -176,7 +170,6 @@ included.  See the back-end documentation for more information.
   :with-inlinetasks         `org-export-with-inlinetasks'
   :with-latex               `org-export-with-latex'
   :with-priority            `org-export-with-priority'
-  :with-properties          `org-export-with-properties'
   :with-smart-quotes        `org-export-with-smart-quotes'
   :with-special-strings     `org-export-with-special-strings'
   :with-statistics-cookies' `org-export-with-statistics-cookies'
@@ -606,12 +599,11 @@ publishing directory.
 Return output file name."
   (unless (file-directory-p pub-dir)
     (make-directory pub-dir t))
-  (let ((output (expand-file-name (file-name-nondirectory filename) pub-dir)))
-    (or (equal (expand-file-name (file-name-directory filename))
-	       (file-name-as-directory (expand-file-name pub-dir)))
-	(copy-file filename output t))
-    ;; Return file name.
-    output))
+  (or (equal (expand-file-name (file-name-directory filename))
+	     (file-name-as-directory (expand-file-name pub-dir)))
+      (copy-file filename
+		 (expand-file-name (file-name-nondirectory filename) pub-dir)
+		 t)))
 
 
 
@@ -632,10 +624,8 @@ See `org-publish-projects'."
 	 (project-plist (cdr project))
 	 (ftname (expand-file-name filename))
 	 (publishing-function
-	  (let ((fun (plist-get project-plist :publishing-function)))
-	    (cond ((null fun) (error "No publishing function chosen"))
-		  ((listp fun) fun)
-		  (t (list fun)))))
+	  (or (plist-get project-plist :publishing-function)
+	      (error "No publishing function chosen")))
 	 (base-dir
 	  (file-name-as-directory
 	   (expand-file-name
@@ -657,14 +647,19 @@ See `org-publish-projects'."
 	   (concat pub-dir
 		   (and (string-match (regexp-quote base-dir) ftname)
 			(substring ftname (match-end 0))))))
-    ;; Allow chain of publishing functions.
-    (dolist (f publishing-function)
-      (when (org-publish-needed-p filename pub-dir f tmp-pub-dir base-dir)
-	(let ((output (funcall f project-plist filename tmp-pub-dir)))
-	  (org-publish-update-timestamp filename pub-dir f base-dir)
-	  (run-hook-with-args 'org-publish-after-publishing-hook
-			      filename
-			      output))))
+    (if (listp publishing-function)
+	;; allow chain of publishing functions
+	(mapc (lambda (f)
+		(when (org-publish-needed-p
+		       filename pub-dir f tmp-pub-dir base-dir)
+		  (funcall f project-plist filename tmp-pub-dir)
+		  (org-publish-update-timestamp filename pub-dir f base-dir)))
+	      publishing-function)
+      (when (org-publish-needed-p
+	     filename pub-dir publishing-function tmp-pub-dir base-dir)
+	(funcall publishing-function project-plist filename tmp-pub-dir)
+	(org-publish-update-timestamp
+	 filename pub-dir publishing-function base-dir)))
     (unless no-cache (org-publish-write-cache-file))))
 
 (defun org-publish-projects (projects)
@@ -810,10 +805,16 @@ Default for SITEMAP-FILENAME is 'sitemap.org'."
 	  (visiting (find-buffer-visiting file))
 	  (buffer (or visiting (find-file-noselect file))))
      (with-current-buffer buffer
-       (org-mode)
        (let ((title
-	      (let ((property (plist-get (org-export-get-environment) :title)))
-		(if property (org-element-interpret-data property)
+	      (let ((property
+		     (plist-get
+		      ;; protect local variables in open buffers
+		      (if visiting
+			  (org-export-with-buffer-copy (org-export-get-environment))
+			(org-export-get-environment))
+		      :title)))
+		(if property
+		    (org-no-properties (org-element-interpret-data property))
 		  (file-name-nondirectory (file-name-sans-extension file))))))
 	 (unless visiting (kill-buffer buffer))
 	 (org-publish-cache-set-file-property file :title title)
@@ -826,12 +827,14 @@ If FILE is an Org file and provides a DATE keyword use it.  In
 any other case use the file system's modification time.  Return
 time in `current-time' format."
   (if (file-directory-p file) (nth 5 (file-attributes file))
-    (let* ((visiting (find-buffer-visiting file))
+    (let* ((org-inhibit-startup t)
+	   (visiting (find-buffer-visiting file))
 	   (file-buf (or visiting (find-file-noselect file nil)))
 	   (date (plist-get
 		  (with-current-buffer file-buf
-		    (let ((org-inhibit-startup t)) (org-mode))
-		    (org-export-get-environment))
+		    (if visiting
+			(org-export-with-buffer-copy (org-export-get-environment))
+		      (org-export-get-environment)))
 		  :date)))
       (unless visiting (kill-buffer file-buf))
       ;; DATE is either a timestamp object or a secondary string.  If it
@@ -878,7 +881,7 @@ publishing will be done asynchronously, in another process."
 			  ;; project is still a string here.
 			  (list (assoc project org-publish-project-alist)))))
     (if async
-	(org-export-async-start 'ignore
+	(org-export-async-start (lambda (results) nil)
 	  `(let ((org-publish-use-timestamps-flag
 		  (if ',force nil ,org-publish-use-timestamps-flag)))
 	     (org-publish-projects ',project-alist)))
@@ -896,7 +899,7 @@ optional argument ASYNC, publishing will be done asynchronously,
 in another process."
   (interactive "P")
   (if async
-      (org-export-async-start 'ignore
+      (org-export-async-start (lambda (results) nil)
 	`(progn
 	   (when ',force (org-publish-remove-all-timestamps))
 	   (let ((org-publish-use-timestamps-flag
@@ -918,7 +921,7 @@ asynchronously, in another process."
   (interactive "P")
   (let ((file (buffer-file-name (buffer-base-buffer))))
     (if async
-	(org-export-async-start 'ignore
+	(org-export-async-start (lambda (results) nil)
 	  `(let ((org-publish-use-timestamps-flag
 		  (if ',force nil ,org-publish-use-timestamps-flag)))
 	     (org-publish-file ,file)))

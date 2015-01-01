@@ -65,12 +65,11 @@
     (latex-fragment . org-latex-latex-fragment)
     (line-break . org-latex-line-break)
     (link . org-latex-link)
-    (node-property . org-latex-node-property)
     (paragraph . org-latex-paragraph)
     (plain-list . org-latex-plain-list)
     (plain-text . org-latex-plain-text)
     (planning . org-latex-planning)
-    (property-drawer . org-latex-property-drawer)
+    (property-drawer . (lambda (&rest args) ""))
     (quote-block . org-latex-quote-block)
     (quote-section . org-latex-quote-section)
     (radio-target . org-latex-radio-target)
@@ -89,9 +88,7 @@
     (timestamp . org-latex-timestamp)
     (underline . org-latex-underline)
     (verbatim . org-latex-verbatim)
-    (verse-block . org-latex-verse-block)
-    ;; Pseudo objects.
-    (latex-math-block . org-latex-math-block))
+    (verse-block . org-latex-verse-block))
   :export-block '("LATEX" "TEX")
   :menu-entry
   '(?l "Export to LaTeX"
@@ -108,9 +105,7 @@
 		   (:latex-header-extra "LATEX_HEADER_EXTRA" nil nil newline)
 		   (:latex-hyperref-p nil "texht" org-latex-with-hyperref t)
 		   ;; Redefine regular options.
-		   (:date "DATE" nil "\\today" t))
-  :filters-alist '((:filter-options . org-latex-math-block-options-filter)
-		   (:filter-parse-tree . org-latex-math-block-tree-filter)))
+		   (:date "DATE" nil "\\today" t)))
 
 
 
@@ -173,9 +168,6 @@
 					    ("qbordermatrix" . "\\cr")
 					    ("kbordermatrix" . "\\\\"))
   "Alist between matrix macros and their row ending.")
-
-(defconst org-latex-pseudo-objects '(latex-math-block)
-  "List of pseudo-object types introduced in the back-end.")
 
 
 
@@ -352,8 +344,7 @@ the toc:nil option, not to those generated with #+TOC keyword."
 (defcustom org-latex-with-hyperref t
   "Toggle insertion of \\hypersetup{...} in the preamble."
   :group 'org-export-latex
-  :type 'boolean
-  :safe #'booleanp)
+  :type 'boolean)
 
 ;;;; Headline
 
@@ -498,14 +489,12 @@ When modifying this variable, it may be useful to change
   :type '(choice (const :tag "Table" table)
 		 (const :tag "Matrix" math)
 		 (const :tag "Inline matrix" inline-math)
-		 (const :tag "Verbatim" verbatim))
-  :safe (lambda (s) (memq s '(table math inline-math verbatim))))
+		 (const :tag "Verbatim" verbatim)))
 
 (defcustom org-latex-tables-centered t
   "When non-nil, tables are exported in a center environment."
   :group 'org-export-latex
-  :type 'boolean
-  :safe #'booleanp)
+  :type 'boolean)
 
 (defcustom org-latex-tables-booktabs nil
   "When non-nil, display tables in a formal \"booktabs\" style.
@@ -516,15 +505,13 @@ attributes."
   :group 'org-export-latex
   :version "24.4"
   :package-version '(Org . "8.0")
-  :type 'boolean
-  :safe #'booleanp)
+  :type 'boolean)
 
 (defcustom org-latex-table-caption-above t
   "When non-nil, place caption string at the beginning of the table.
 Otherwise, place it near the end."
   :group 'org-export-latex
-  :type 'boolean
-  :safe #'booleanp)
+  :type 'boolean)
 
 (defcustom org-latex-table-scientific-notation "%s\\,(%s)"
   "Format string to display numbers in scientific notation.
@@ -537,7 +524,8 @@ When nil, no transformation is made."
   :package-version '(Org . "8.0")
   :type '(choice
 	  (string :tag "Format string")
-	  (const :tag "No formatting")))
+	  (const :tag "No formatting" nil)))
+
 
 ;;;; Text markup
 
@@ -668,8 +656,7 @@ into previewing problems, please consult
   :type '(choice
 	  (const :tag "Use listings" t)
 	  (const :tag "Use minted" minted)
-	  (const :tag "Export verbatim" nil))
-  :safe (lambda (s) (memq s '(t nil minted))))
+	  (const :tag "Export verbatim" nil)))
 
 (defcustom org-latex-listings-langs
   '((emacs-lisp "Lisp") (lisp "Lisp") (clojure "Lisp")
@@ -702,9 +689,9 @@ These options are supplied as a comma-separated list to the
 a list containing two strings: the name of the option, and the
 value.  For example,
 
-  (setq org-latex-listings-options
+  \(setq org-latex-listings-options
     '((\"basicstyle\" \"\\\\small\")
-      (\"keywordstyle\" \"\\\\color{black}\\\\bfseries\\\\underbar\")))
+      \(\"keywordstyle\" \"\\\\color{black}\\\\bfseries\\\\underbar\")))
 
 will typeset the code in a small size font with underlined, bold
 black keywords.
@@ -1011,7 +998,9 @@ See `org-latex-text-markup-alist' for details."
      ;; and use "\\verb" command.
      ((eq 'verb fmt)
       (let ((separator (org-latex--find-verb-separator text)))
-	(concat "\\verb" separator text separator)))
+	(concat "\\verb" separator
+		(replace-regexp-in-string "\n" " " text)
+		separator)))
      ;; Handle the `protectedtexttt' special case: Protect some
      ;; special chars and use "\texttt{%s}" format string.
      ((eq 'protectedtexttt fmt)
@@ -1075,11 +1064,6 @@ just outside of it."
 	      (reverse all-refs)))))
      (funcall search-refs element))
    ""))
-
-(defun org-latex--translate (s info)
-  "Translate string S according to specified language.
-INFO is a plist used as a communication channel."
-  (org-export-translate s :latex info))
 
 
 
@@ -1248,7 +1232,8 @@ holding contextual information.  See `org-export-data'."
   "Transcode an ENTITY object from Org to LaTeX.
 CONTENTS are the definition itself.  INFO is a plist holding
 contextual information."
-  (org-element-property :latex entity))
+  (let ((ent (org-element-property :latex entity)))
+    (if (org-element-property :latex-math-p entity) (format "$%s$" ent) ent)))
 
 
 ;;;; Example Block
@@ -1359,7 +1344,16 @@ holding contextual information."
 	       ((= (length sec) 4)
 		(if numberedp (concat (car sec) "\n%s" (nth 1 sec))
 		  (concat (nth 2 sec) "\n%s" (nth 3 sec)))))))
-	   (text (org-export-data (org-element-property :title headline) info))
+	   ;; Create a temporary export back-end that hard-codes
+	   ;; "\underline" within "\section" and alike.
+	   (section-back-end
+	    (org-export-create-backend
+	     :parent 'latex
+	     :transcoders
+	     '((underline . (lambda (o c i) (format "\\underline{%s}" c))))))
+	   (text
+	    (org-export-data-with-backend
+	     (org-element-property :title headline) section-back-end info))
 	   (todo
 	    (and (plist-get info :with-todo-keywords)
 		 (let ((todo (org-element-property :todo-keyword headline)))
@@ -1391,7 +1385,13 @@ holding contextual information."
 		  (when (org-export-first-sibling-p headline info)
 		    (format "\\begin{%s}\n" (if numberedp 'enumerate 'itemize)))
 		  ;; Itemize headline
-		  "\\item " full-text "\n" headline-label pre-blanks contents)))
+		  "\\item"
+		  (and full-text (org-string-match-p "\\`[ \t]*\\[" full-text)
+		       "\\relax")
+		  " " full-text "\n"
+		  headline-label
+		  pre-blanks
+		  contents)))
 	    ;; If headline is not the last sibling simply return
 	    ;; LOW-LEVEL-BODY.  Otherwise, also close the list, before
 	    ;; any blank line.
@@ -1406,8 +1406,9 @@ holding contextual information."
 	(let ((opt-title
 	       (funcall org-latex-format-headline-function
 			todo todo-type priority
-			(org-export-data
-			 (org-export-get-alt-title headline info) info)
+			(org-export-data-with-backend
+			 (org-export-get-alt-title headline info)
+			 section-back-end info)
 			(and (eq (plist-get info :with-tags) t) tags))))
 	  (if (and numberedp opt-title
 		   (not (equal opt-title full-text))
@@ -1475,7 +1476,7 @@ contextual information."
       (let* ((org-lang (org-element-property :language inline-src-block))
 	     (mint-lang (or (cadr (assq (intern org-lang)
 					org-latex-minted-langs))
-			    org-lang))
+			    (downcase org-lang)))
 	     (options (org-latex--make-option-string
 		       org-latex-minted-options)))
 	(concat (format "\\mint%s{%s}"
@@ -1525,17 +1526,16 @@ holding contextual information."
 	       (when priority (format "\\framebox{\\#%c} " priority))
 	       title
 	       (when tags (format "\\hfill{}\\textsc{:%s:}"
-				  (mapconcat 'identity tags ":"))))))
-	 (format (concat "\\begin{center}\n"
-			 "\\fbox{\n"
-			 "\\begin{minipage}[c]{.6\\textwidth}\n"
-			 "%s\n\n"
-			 "\\rule[.8em]{\\textwidth}{2pt}\n\n"
-			 "%s"
-			 "\\end{minipage}\n"
-			 "}\n"
-			 "\\end{center}")
-		 full-title contents))))))
+				  (mapconcat #'identity tags ":"))))))
+	 (concat "\\begin{center}\n"
+		 "\\fbox{\n"
+		 "\\begin{minipage}[c]{.6\\textwidth}\n"
+		 full-title "\n\n"
+		 (and (org-string-nw-p contents)
+		      (concat "\\rule[.8em]{\\textwidth}{2pt}\n\n" contents))
+		 "\\end{minipage}\n"
+		 "}\n"
+		 "\\end{center}"))))))
 
 
 ;;;; Italic
@@ -1581,7 +1581,25 @@ contextual information."
 		(and tag (format "[{%s}] "
 				 (concat checkbox
 					 (org-export-data tag info)))))))
-    (concat counter "\\item" (or tag (concat " " checkbox))
+    (concat counter
+	    "\\item"
+	    (cond
+	     (tag)
+	     (checkbox (concat " " checkbox))
+	     ;; Without a tag or a check-box, if CONTENTS starts with
+	     ;; an opening square bracket, add "\relax" to "\item",
+	     ;; unless the brackets comes from an initial export
+	     ;; snippet (i.e. it is inserted willingly by the user).
+	     ((and contents
+		   (org-string-match-p "\\`[ \t]*\\[" contents)
+		   (not (let ((e (car (org-element-contents item))))
+			  (and (eq (org-element-type e) 'paragraph)
+			       (let ((o (car (org-element-contents e))))
+				 (and (eq (org-element-type o) 'export-snippet)
+				      (eq (org-export-snippet-backend o)
+					  'latex)))))))
+	      "\\relax ")
+	     (t " "))
 	    (and contents (org-trim contents))
 	    ;; If there are footnotes references in tag, be sure to
 	    ;; add their definition at the end of the item.  This
@@ -1650,14 +1668,8 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 (defun org-latex-latex-fragment (latex-fragment contents info)
   "Transcode a LATEX-FRAGMENT object from Org to LaTeX.
 CONTENTS is nil.  INFO is a plist holding contextual information."
-  (let ((value (org-element-property :value latex-fragment)))
-    ;; Trim math markers since the fragment is enclosed within
-    ;; a latex-math-block object anyway.
-    (cond ((string-match "\\`\\(\\$\\{1,2\\}\\)\\([^\000]*\\)\\1\\'" value)
-	   (match-string 2 value))
-	  ((string-match "\\`\\\\(\\([^\000]*\\)\\\\)\\'" value)
-	   (match-string 1 value))
-	  (t value))))
+  (when (plist-get info :with-latex)
+    (org-element-property :value latex-fragment)))
 
 
 ;;;; Line Break
@@ -1777,7 +1789,8 @@ DESC is the description part of the link, or the empty string.
 INFO is a plist holding contextual information.  See
 `org-export-data'."
   (let* ((type (org-element-property :type link))
-	 (raw-path (org-element-property :path link))
+	 (raw-path (replace-regexp-in-string
+		    "%" "\\%" (org-element-property :path link) nil t))
 	 ;; Ensure DESC really exists, or set it to nil.
 	 (desc (and (not (string= desc "")) desc))
 	 (imagep (org-export-inline-image-p
@@ -1785,9 +1798,8 @@ INFO is a plist holding contextual information.  See
 	 (path (cond
 		((member type '("http" "https" "ftp" "mailto"))
 		 (concat type ":" raw-path))
-		((string= type "file")
-		 (if (not (file-name-absolute-p raw-path)) raw-path
-		   (concat "file://" (expand-file-name raw-path))))
+		((and (string= type "file") (file-name-absolute-p raw-path))
+		 (concat "file:" raw-path))
 		(t raw-path)))
 	 protocol)
     (cond
@@ -1797,10 +1809,11 @@ INFO is a plist holding contextual information.  See
      ;; description.
      ((string= type "radio")
       (let ((destination (org-export-resolve-radio-link link info)))
-	(when destination
+	(if (not destination) desc
 	  (format "\\hyperref[%s]{%s}"
-		  (org-export-solidify-link-text path)
-		  (org-export-data (org-element-contents destination) info)))))
+		  (org-export-solidify-link-text
+		   (org-element-property :value destination))
+		  desc))))
      ;; Links pointing to a headline: Find destination and build
      ;; appropriate referencing command.
      ((member type '("custom-id" "fuzzy" "id"))
@@ -1829,7 +1842,8 @@ INFO is a plist holding contextual information.  See
 			   'number-to-string
 			   (org-export-get-headline-number destination info)
 			   "-"))))
-	     (if (and (plist-get info :section-numbers) (not desc))
+	     (if (and (not desc)
+		      (org-export-numbered-headline-p destination info))
 		 (format "\\ref{%s}" label)
 	       (format "\\hyperref[%s]{%s}" label
 		       (or desc
@@ -1856,18 +1870,6 @@ INFO is a plist holding contextual information.  See
      (t (format org-latex-link-with-unknown-path-format desc)))))
 
 
-;;;; Node Property
-
-(defun org-latex-node-property (node-property contents info)
-  "Transcode a NODE-PROPERTY element from Org to LaTeX.
-CONTENTS is nil.  INFO is a plist holding contextual
-information."
-  (format "%s:%s"
-          (org-element-property :key node-property)
-          (let ((value (org-element-property :value node-property)))
-            (if value (concat " " value) ""))))
-
-
 ;;;; Paragraph
 
 (defun org-latex-paragraph (paragraph contents info)
@@ -1888,18 +1890,13 @@ contextual information."
 	 (latex-type (let ((env (plist-get attr :environment)))
 		       (cond (env (format "%s" env))
 			     ((eq type 'ordered) "enumerate")
-			     ((eq type 'unordered) "itemize")
-			     ((eq type 'descriptive) "description")))))
+			     ((eq type 'descriptive) "description")
+			     (t "itemize")))))
     (org-latex--wrap-label
      plain-list
      (format "\\begin{%s}%s\n%s\\end{%s}"
 	     latex-type
-	     ;; Put optional arguments, if any inside square brackets
-	     ;; when necessary.
-	     (let ((options (format "%s" (or (plist-get attr :options) ""))))
-	       (cond ((equal options "") "")
-		     ((string-match "\\`\\[.*\\]\\'" options) options)
-		     (t (format "[%s]" options))))
+	     (or (plist-get attr :options) "")
 	     contents
 	     latex-type))))
 
@@ -1991,82 +1988,6 @@ information."
     " ")
    "\\\\"))
 
-
-;;;; Property Drawer
-
-(defun org-latex-property-drawer (property-drawer contents info)
-  "Transcode a PROPERTY-DRAWER element from Org to LaTeX.
-CONTENTS holds the contents of the drawer.  INFO is a plist
-holding contextual information."
-  (and (org-string-nw-p contents)
-       (format "\\begin{verbatim}\n%s\\end{verbatim}" contents)))
-
-
-;;;; Pseudo Object: LaTeX Math Block
-
-(defun org-latex--wrap-latex-math-block (data info)
-  "Merge contiguous math objects in a pseudo-object container.
-DATA is a parse tree or a secondary string.  INFO is a plist
-containing export options.  Modify DATA by side-effect and return it."
-  (let ((valid-object-p
-	 (function
-	  ;; Non-nil when OBJ can be added to the latex math block.
-	  (lambda (obj)
-	    (case (org-element-type obj)
-	      (entity (org-element-property :latex-math-p obj))
-	      (latex-fragment
-	       (let ((value (org-element-property :value obj)))
-		 (or (org-string-match-p "\\`\\\\([^\000]*\\\\)\\'" value)
-		     (org-string-match-p "\\`\\$[^\000]*\\$\\'" value))))
-	      ((subscript superscript) t))))))
-    (org-element-map data '(entity latex-fragment subscript superscript)
-      (lambda (object)
-	;; Skip objects already wrapped.
-	(when (and (not (eq (org-element-type
-			     (org-element-property :parent object))
-			    'latex-math-block))
-		   (funcall valid-object-p object))
-	  (let ((math-block (list 'latex-math-block nil))
-		(next-elements (org-export-get-next-element object info t))
-		(last object))
-	    ;; Wrap MATH-BLOCK around OBJECT in DATA.
-	    (org-element-insert-before math-block object)
-	    (org-element-extract-element object)
-	    (org-element-adopt-elements math-block object)
-	    (when (zerop (or (org-element-property :post-blank object) 0))
-	      ;; MATH-BLOCK swallows consecutive math objects.
-	      (catch 'exit
-		(dolist (next next-elements)
-		  (if (not (funcall valid-object-p next)) (throw 'exit nil)
-		    (org-element-extract-element next)
-		    (org-element-adopt-elements math-block next)
-		    ;; Eschew the case: \beta$x$ -> \(\betax\).
-		    (unless (memq (org-element-type next)
-				  '(subscript superscript))
-		      (org-element-put-property last :post-blank 1))
-		    (setq last next)
-		    (when (> (or (org-element-property :post-blank next) 0) 0)
-		      (throw 'exit nil))))))
-	    (org-element-put-property
-	     math-block :post-blank (org-element-property :post-blank last)))))
-      info nil '(subscript superscript latex-math-block) t)
-    ;; Return updated DATA.
-    data))
-
-(defun org-latex-math-block-tree-filter (tree backend info)
-  (org-latex--wrap-latex-math-block tree info))
-
-(defun org-latex-math-block-options-filter (info backend)
-  (dolist (prop '(:author :date :title) info)
-    (plist-put info prop
-	       (org-latex--wrap-latex-math-block (plist-get info prop) info))))
-
-(defun org-latex-math-block (math-block contents info)
-  "Transcode a MATH-BLOCK object from Org to LaTeX.
-CONTENTS is a string.  INFO is a plist used as a communication
-channel."
-  (when (org-string-nw-p contents)
-    (format "\\(%s\\)" (org-trim contents))))
 
 ;;;; Quote Block
 
@@ -2194,7 +2115,8 @@ contextual information."
 		       ("firstnumber" ,(number-to-string (1+ num-start))))
 		     org-latex-minted-options)))
 		 ;; Language.
-		 (or (cadr (assq (intern lang) org-latex-minted-langs)) lang)
+		 (or (cadr (assq (intern lang) org-latex-minted-langs))
+		     (downcase lang))
 		 ;; Source code.
 		 (let* ((code-info (org-export-unravel-code src-block))
 			(max-width
@@ -2243,8 +2165,8 @@ contextual information."
 	       ((and float (not (assoc "float" org-latex-listings-options)))
 		`(("float" ,org-latex-default-figure-position))))
 	      `(("language" ,lst-lang))
-	      (when label `(("label" ,label)))
-	      (when caption-str `(("caption" ,caption-str)))
+	      (if label `(("label" ,label)) '(("label" " ")))
+	      (if caption-str `(("caption" ,caption-str)) '(("caption" " ")))
 	      (cond ((assoc "numbers" org-latex-listings-options) nil)
 		    ((not num-start) '(("numbers" "none")))
 		    ((zerop num-start) '(("numbers" "left")))
@@ -2297,7 +2219,17 @@ holding contextual information."
   "Transcode a subscript or superscript object.
 OBJECT is an Org object.  INFO is a plist used as a communication
 channel."
-  (let ((type (org-element-type object))
+  (let ((in-script-p
+	 ;; Non-nil if object is already in a sub/superscript.
+	 (let ((parent object))
+	   (catch 'exit
+	     (while (setq parent (org-export-get-parent parent))
+	       (let ((type (org-element-type parent)))
+		 (cond ((memq type '(subscript superscript))
+			(throw 'exit t))
+		       ((memq type org-element-all-elements)
+			(throw 'exit nil))))))))
+	(type (org-element-type object))
 	(output ""))
     (org-element-map (org-element-contents object)
 	(cons 'plain-text org-element-all-objects)
@@ -2323,12 +2255,31 @@ channel."
 			 (let ((blank (org-element-property :post-blank obj)))
 			   (and blank (> blank 0) "\\ ")))))))
       info nil org-element-recursive-objects)
-    ;; Result.  Do not wrap into curly brackets if OUTPUT is a single
-    ;; character.
-    (concat (if (eq (org-element-type object) 'subscript) "_" "^")
+    ;; Result.  Do not wrap into math mode if already in a subscript
+    ;; or superscript.  Do not wrap into curly brackets if OUTPUT is
+    ;; a single character.  Also merge consecutive subscript and
+    ;; superscript into the same math snippet.
+    (concat (and (not in-script-p)
+		 (let ((prev (org-export-get-previous-element object info)))
+		   (or (not prev)
+		       (not (eq (org-element-type prev)
+				(if (eq type 'subscript) 'superscript
+				  'subscript)))
+		       (let ((blank (org-element-property :post-blank prev)))
+			 (and blank (> blank 0)))))
+		 "$")
+	    (if (eq (org-element-type object) 'subscript) "_" "^")
 	    (and (> (length output) 1) "{")
 	    output
-	    (and (> (length output) 1) "}"))))
+	    (and (> (length output) 1) "}")
+	    (and (not in-script-p)
+		 (or (let ((blank (org-element-property :post-blank object)))
+		       (and blank (> blank 0)))
+		     (not (eq (org-element-type
+			       (org-export-get-next-element object info))
+			      (if (eq type 'subscript) 'superscript
+				'subscript))))
+		 "$"))))
 
 (defun org-latex-subscript (subscript contents info)
   "Transcode a SUBSCRIPT object from Org to LaTeX.
@@ -2372,8 +2323,7 @@ contextual information."
 	(format "\\begin{verbatim}\n%s\n\\end{verbatim}"
 		;; Re-create table, without affiliated keywords.
 		(org-trim (org-element-interpret-data
-			   `(table nil ,@(org-element-contents table))
-			   org-latex-pseudo-objects))))
+			   `(table nil ,@(org-element-contents table))))))
        ;; Case 2: Matrix.
        ((or (string= type "math") (string= type "inline-math"))
 	(org-latex--math-table table info))
@@ -2568,9 +2518,7 @@ This function assumes TABLE has `org' as its `:type' property and
 	       (concat
 		(mapconcat
 		 (lambda (cell)
-		   (substring
-		    (org-element-interpret-data cell org-latex-pseudo-objects)
-		    0 -1))
+		   (substring (org-element-interpret-data cell) 0 -1))
 		 (org-element-map row 'table-cell 'identity info) "&")
 		(or (cdr (assoc env org-latex-table-matrix-macros)) "\\\\")
 		"\n")))
@@ -2679,33 +2627,18 @@ a communication channel."
 	     ((and (memq 'top borders) (memq 'above borders)) "\\hline\n"))
        contents "\\\\\n"
        (cond
-	;; Special case for long tables.  Define header and footers.
+	;; Special case for long tables. Define header and footers.
 	((and longtablep (org-export-table-row-ends-header-p table-row info))
 	 (format "%s
-\\endfirsthead
-\\multicolumn{%d}{l}{%s} \\\\
-%s
-%s \\\\\n
-%s
 \\endhead
-%s\\multicolumn{%d}{r}{%s} \\\\
+%s\\multicolumn{%d}{r}{Continued on next page} \\\\
 \\endfoot
 \\endlastfoot"
-		 (if booktabsp "\\midrule" "\\hline")
-		 (cdr (org-export-table-dimensions
-		       (org-export-get-parent-table table-row) info))
-		 (org-latex--translate "Continued from previous page" info)
-		 (cond ((and booktabsp (memq 'top borders)) "\\toprule\n")
-		       ((and (memq 'top borders)
-			     (memq 'above borders)) "\\hline\n")
-		       (t ""))
-		 contents
 		 (if booktabsp "\\midrule" "\\hline")
 		 (if booktabsp "\\midrule" "\\hline")
 		 ;; Number of columns.
 		 (cdr (org-export-table-dimensions
-		       (org-export-get-parent-table table-row) info))
-		 (org-latex--translate "Continued on next page" info)))
+		       (org-export-get-parent-table table-row) info))))
 	;; When BOOKTABS are activated enforce bottom rule even when
 	;; no hline was specifically marked.
 	((and booktabsp (memq 'bottom borders)) "\\bottomrule")
@@ -3003,7 +2936,9 @@ Return output file name."
   ;; in working directory and then moved to publishing directory.
   (org-publish-attachment
    plist
-   (org-latex-compile (org-publish-org-to 'latex filename ".tex" plist))
+   (org-latex-compile
+    (org-publish-org-to
+     'latex filename ".tex" plist (file-name-directory filename)))
    pub-dir))
 
 

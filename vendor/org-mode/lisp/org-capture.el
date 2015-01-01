@@ -741,7 +741,8 @@ captured item after finalizing."
 	      (pos (org-capture-get :initial-target-position))
 	      (ipt (org-capture-get :insertion-point))
 	      (size (org-capture-get :captured-entry-size)))
-	  (when reg
+	  (if (not reg)
+	      (widen)
 	    (cond ((< ipt (car reg))
 		   ;; insertion point is before the narrowed region
 		   (narrow-to-region (+ size (car reg)) (+ size (cdr reg))))
@@ -1021,9 +1022,9 @@ may have been stored before."
 	 (target-entry-p (org-capture-get :target-entry-p))
 	 level beg end file)
 
-    (and (org-capture-get :exact-position)
-	 (goto-char (org-capture-get :exact-position)))
     (cond
+     ((org-capture-get :exact-position)
+      (goto-char (org-capture-get :exact-position)))
      ((not target-entry-p)
       ;; Insert as top-level entry, either at beginning or at end of file
       (setq level 1)
@@ -1528,8 +1529,8 @@ The template may still contain \"%?\" for cursor positioning."
 	 (v-x (or (org-get-x-clipboard 'PRIMARY)
 		  (org-get-x-clipboard 'CLIPBOARD)
 		  (org-get-x-clipboard 'SECONDARY)))
-	 (v-t (format-time-string (car org-time-stamp-formats) ct))
-	 (v-T (format-time-string (cdr org-time-stamp-formats) ct))
+	 (v-t (format-time-string (car org-time-stamp-formats) ct1))
+	 (v-T (format-time-string (cdr org-time-stamp-formats) ct1))
 	 (v-u (concat "[" (substring v-t 1 -1) "]"))
 	 (v-U (concat "[" (substring v-T 1 -1) "]"))
 	 ;; `initial' and `annotation' might habe been passed.
@@ -1586,7 +1587,7 @@ The template may still contain \"%?\" for cursor positioning."
       (insert template)
       (goto-char (point-min))
       (org-capture-steal-local-variables buffer)
-      (setq buffer-file-name nil)
+      (setq buffer-file-name nil mark-active nil)
 
       ;; %[] Insert contents of a file.
       (goto-char (point-min))
@@ -1673,7 +1674,9 @@ The template may still contain \"%?\" for cursor positioning."
 		(or (equal (char-before) ?:) (insert ":"))
 		(insert ins)
 		(or (equal (char-after) ?:) (insert ":"))
-		(and (org-at-heading-p) (org-set-tags nil 'align)))))
+		(and (org-at-heading-p)
+		     (let ((org-ignore-region t))
+		       (org-set-tags nil 'align))))))
 	   ((equal char "C")
 	    (cond ((= (length clipboards) 1) (insert (car clipboards)))
 		  ((> (length clipboards) 1)

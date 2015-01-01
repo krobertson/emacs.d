@@ -88,11 +88,11 @@
 (defvar org-closed-string)
 (defvar org-deadline-string)
 (defvar org-description-max-indent)
+(defvar org-drawers)
 (defvar org-odd-levels-only)
 (defvar org-scheduled-string)
 (defvar org-ts-regexp)
 (defvar org-ts-regexp-both)
-(defvar org-drawer-regexp)
 
 (declare-function outline-invisible-p "outline" (&optional pos))
 (declare-function outline-flag-region "outline" (from to flag))
@@ -430,6 +430,9 @@ group 4: description tag")
     (let* ((case-fold-search t)
 	   (context (org-list-context))
 	   (lim-up (car context))
+	   (drawers-re (concat "^[ \t]*:\\("
+			       (mapconcat 'regexp-quote org-drawers "\\|")
+			       "\\):[ \t]*$"))
 	   (inlinetask-re (and (featurep 'org-inlinetask)
 			       (org-inlinetask-outline-regexp)))
 	   (item-re (org-item-re))
@@ -473,7 +476,7 @@ group 4: description tag")
 	       ((and (looking-at "^[ \t]*#\\+end_")
 		     (re-search-backward "^[ \t]*#\\+begin_" lim-up t)))
 	       ((and (looking-at "^[ \t]*:END:")
-		     (re-search-backward org-drawer-regexp lim-up t))
+		     (re-search-backward drawers-re lim-up t))
 		(beginning-of-line))
 	       ((and inlinetask-re (looking-at inlinetask-re))
 		(org-inlinetask-goto-beginning)
@@ -544,7 +547,11 @@ Contexts `block' and `invalid' refer to `org-list-forbidden-blocks'."
 	     (lim-down (or (save-excursion (outline-next-heading)) (point-max))))
 	 ;; Is point inside a drawer?
 	 (let ((end-re "^[ \t]*:END:")
-	       (beg-re org-drawer-regexp))
+	       ;; Can't use org-drawers-regexp as this function might
+	       ;; be called in buffers not in Org mode.
+	       (beg-re (concat "^[ \t]*:\\("
+			       (mapconcat 'regexp-quote org-drawers "\\|")
+			       "\\):[ \t]*$")))
 	   (when (save-excursion
 		   (and (not (looking-at beg-re))
 			(not (looking-at end-re))
@@ -628,6 +635,9 @@ Assume point is at an item."
 	   (lim-down (nth 1 context))
 	   (text-min-ind 10000)
 	   (item-re (org-item-re))
+	   (drawers-re (concat "^[ \t]*:\\("
+			       (mapconcat 'regexp-quote org-drawers "\\|")
+			       "\\):[ \t]*$"))
 	   (inlinetask-re (and (featurep 'org-inlinetask)
 			       (org-inlinetask-outline-regexp)))
 	   (beg-cell (cons (point) (org-get-indentation)))
@@ -690,7 +700,7 @@ Assume point is at an item."
 	       ((and (looking-at "^[ \t]*#\\+end_")
 		     (re-search-backward "^[ \t]*#\\+begin_" lim-up t)))
 	       ((and (looking-at "^[ \t]*:END:")
-		     (re-search-backward org-drawer-regexp lim-up t))
+		     (re-search-backward drawers-re lim-up t))
 		(beginning-of-line))
 	       ((and inlinetask-re (looking-at inlinetask-re))
 		(org-inlinetask-goto-beginning)
@@ -756,7 +766,7 @@ Assume point is at an item."
 	      (cond
 	       ((and (looking-at "^[ \t]*#\\+begin_")
 		     (re-search-forward "^[ \t]*#\\+end_" lim-down t)))
-	       ((and (looking-at org-drawer-regexp)
+	       ((and (looking-at drawers-re)
 		     (re-search-forward "^[ \t]*:END:" lim-down t))))
 	      (forward-line 1))))))
       (setq struct (append itm-lst (cdr (nreverse itm-lst-2)))
@@ -1244,7 +1254,7 @@ some heuristics to guess the result."
 If POS is before first character after bullet of the item, the
 new item will be created before the current one.
 
-STRUCT is the list structure.  PREVS is the the alist of previous
+STRUCT is the list structure.  PREVS is the alist of previous
 items, as returned by `org-list-prevs-alist'.
 
 Insert a checkbox if CHECKBOX is non-nil, and string AFTER-BULLET
@@ -2227,7 +2237,7 @@ item is invisible."
 	  t)))))
 
 (defun org-list-repair ()
-  "Fix indentation, bullets and checkboxes is the list at point."
+  "Fix indentation, bullets and checkboxes in the list at point."
   (interactive)
   (unless (org-at-item-p) (error "This is not a list"))
   (let* ((struct (org-list-struct))
@@ -2316,6 +2326,9 @@ in subtree, ignoring drawers."
 	   block-item
 	   lim-up
 	   lim-down
+	   (drawer-re (concat "^[ \t]*:\\("
+			      (mapconcat 'regexp-quote org-drawers "\\|")
+			      "\\):[ \t]*$"))
 	   (keyword-re (concat "^[ \t]*\\<\\(" org-scheduled-string
 			       "\\|" org-deadline-string
 			       "\\|" org-closed-string
@@ -2337,8 +2350,7 @@ in subtree, ignoring drawers."
 	      ;; time-stamps (scheduled, etc.).
 	      (let ((limit (save-excursion (outline-next-heading) (point))))
 		(forward-line 1)
-		(while (or (looking-at org-drawer-regexp)
-			   (looking-at keyword-re))
+		(while (or (looking-at drawer-re) (looking-at keyword-re))
 		  (if (looking-at keyword-re)
 		      (forward-line 1)
 		    (re-search-forward "^[ \t]*:END:" limit nil)))
