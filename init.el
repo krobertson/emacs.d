@@ -168,6 +168,7 @@
 (add-to-list 'load-path (emacs-d "vendor"))
 (load (emacs-d "vendor/jekyll"))
 (load (emacs-d "vendor/linum+"))
+(load (emacs-d "vendor/protobuf-mode"))
 ;; window numbering
 (load (emacs-d "vendor/window_numbering"))
 (window-numbering-mode 1)
