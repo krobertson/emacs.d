@@ -50,12 +50,10 @@
   :commands evil-mode)
 
 (use-package exec-path-from-shell
-  :init
-  (progn
-    (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
-      (add-to-list 'exec-path-from-shell-variables var)))
   :config
   (progn
+    (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
+      (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
 
 (use-package fiplr
@@ -125,7 +123,8 @@
     (setq magit-completing-read-function 'magit-ido-completing-read)
     (setq magit-stage-all-confirm nil)
     (setq magit-unstage-all-confirm nil)
-    (setq magit-restore-window-configuration t))
+    (setq magit-restore-window-configuration t)
+    (setq magit-last-seen-setup-instructions "1.4.0"))
   :bind ("C-x g" . magit-status))
 
 (use-package markdown-mode
