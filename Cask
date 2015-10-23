@@ -7,6 +7,7 @@
 (depends-on "cask")
 (depends-on "clojure-mode")
 (depends-on "diminish")
+(depends-on "dockerfile-mode")
 (depends-on "enh-ruby-mode")
 (depends-on "evil")
 (depends-on "exec-path-from-shell")

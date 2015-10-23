@@ -41,6 +41,9 @@
 (use-package clojure-mode
   :defer t)
 
+(use-package dockerfile-mode
+  :defer t)
+
 (use-package diminish
   :config
   (progn
