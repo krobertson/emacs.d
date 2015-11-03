@@ -15,13 +15,17 @@
         indent-for-tab-command
         ledger-magic-tab
         ledger-post-align-xact
+        markdown-enter-key
         markdown-exdent-or-delete
+        nxml-electric-slash
         org-self-insert-command
         ruby-end-space
         sgml-slash
         sh-assignment
         smart-line-beginning
         smart-move-line-beginning
+        yaml-electric-backspace
+        yaml-electric-dash-and-dot
         ))
 
 (setq mc/cmds-to-run-once
