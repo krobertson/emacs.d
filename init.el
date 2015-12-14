@@ -172,9 +172,6 @@
 ;; window numbering
 (load (emacs-d "vendor/window_numbering"))
 (window-numbering-mode 1)
-;; folding mode
-(load (emacs-d "vendor/folding"))
-(folding-mode-add-find-file-hook)
 
 ;; custom functions
 (load (emacs-d "functions"))

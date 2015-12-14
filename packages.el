@@ -49,9 +49,6 @@
   (progn
     (add-hook 'whitespace-mode-hook (lambda () (diminish 'whitespace-mode)))))
 
-(use-package evil
-  :commands evil-mode)
-
 (use-package exec-path-from-shell
   :config
   (progn
@@ -133,9 +130,6 @@
 (use-package markdown-mode
   :mode ("\\.\\(m\\(ark\\)?down\\|md\\)$" . markdown-mode)
   :config)
-
-(use-package multi-term
-  :commands multi-term)
 
 (use-package multiple-cursors
   :bind (("C->" . mc/mark-next-like-this)
