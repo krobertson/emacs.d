@@ -54,6 +54,7 @@
   (progn
     (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
       (add-to-list 'exec-path-from-shell-variables var))
+    (setq exec-path-from-shell-check-startup-files nil)
     (exec-path-from-shell-initialize)))
 
 (use-package fiplr
