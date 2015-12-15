@@ -2,19 +2,19 @@
   "Use ido to select a recently opened file from the `recentf-list'"
   (interactive)
   (let ((home (expand-file-name (getenv "HOME"))))
-  (find-file
-    (ido-completing-read "Recentf open: "
-      (mapcar (lambda (path)
-        (replace-regexp-in-string home "~" path))
-        recentf-list)
-      nil t))))
+    (find-file
+     (ido-completing-read "Recentf open: "
+                          (mapcar (lambda (path)
+                                    (replace-regexp-in-string home "~" path))
+                                  recentf-list)
+                          nil t))))
 
 (defun kr-ido-find-project-file ()
   "Load a file under one of the source projects."
   (interactive)
   (ido-find-file-in-dir
-    (concat "~/source/" (ido-completing-read "Project: "
-                          (directory-files "~/source/" nil "^[^.]")))))
+   (concat "~/source/" (ido-completing-read "Project: "
+                                            (directory-files "~/source/" nil "^[^.]")))))
 
 (defun kr-mark-line ()
   "Sets the mark as the current line."
@@ -35,14 +35,14 @@
   (delete-trailing-whitespace))
 
 (defun comment-or-uncomment-region-or-line ()
-    "Comments or uncomments the region or the current line if there's no active region."
-    (interactive)
-    (let (beg end)
-        (if (region-active-p)
-            (setq beg (region-beginning) end (region-end))
-            (setq beg (line-beginning-position) end (line-end-position)))
-        (comment-or-uncomment-region beg end)
-        (next-line)))
+  "Comments or uncomments the region or the current line if there's no active region."
+  (interactive)
+  (let (beg end)
+    (if (region-active-p)
+        (setq beg (region-beginning) end (region-end))
+      (setq beg (line-beginning-position) end (line-end-position)))
+    (comment-or-uncomment-region beg end)
+    (next-line)))
 
 (defun move-line-down ()
   (interactive)
@@ -73,13 +73,6 @@
   (newline)
   (forward-line -1)
   (indent-for-tab-command))
-
-(defun kill-other-buffers ()
-  "Kill all other buffers."
-  (interactive)
-  (mapc 'kill-buffer
-    (delq (current-buffer)
-      (remove-if-not 'buffer-file-name (buffer-list)))))
 
 (defun kr-delete-line ()
   "Deletes the current line, doesn't affect kill-ring or clipboard."
@@ -129,8 +122,8 @@ the current position of point, then move it to the beginning of the line."
   The variable `sort-fold-case' determines whether alphabetic case
   affects the sort order.
   See `sort-regexp-fields'."
-    (interactive "*P\nr")
-    (sort-regexp-fields reverse "\\w+" "\\&" beg end))
+  (interactive "*P\nr")
+  (sort-regexp-fields reverse "\\w+" "\\&" beg end))
 
 (defun json-format ()
   (interactive)
@@ -148,19 +141,15 @@ Note the weekly scope of the command's precision.")
 (defun insert-current-date-time ()
   "insert the current date and time into current buffer.
 Uses `current-date-time-format' for the formatting the date/time."
-       (interactive)
-       ;(insert "==========\n")
-;       (insert (let () (comment-start)))
-       (insert (format-time-string current-date-time-format (current-time)))
-       (insert "\n")
-       )
+  (interactive)
+  (insert (format-time-string current-date-time-format (current-time)))
+  (insert "\n"))
 
 (defun insert-current-time ()
   "insert the current time (1-week scope) into the current buffer."
-       (interactive)
-       (insert (format-time-string current-time-format (current-time)))
-       (insert "\n")
-       )
+  (interactive)
+  (insert (format-time-string current-time-format (current-time)))
+  (insert "\n"))
 
 (global-set-key "\C-c\C-d" 'insert-current-date-time)
 (global-set-key "\C-c\C-t" 'insert-current-time)
