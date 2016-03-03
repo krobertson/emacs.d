@@ -21,7 +21,8 @@
 
 ;; set the theme
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-(load-theme 'monokai t nil)
+;(load-theme 'monokai t nil)
+(load-theme 'ample t nil)
 
 ;; cursor
 (setq-default cursor-type 'bar)

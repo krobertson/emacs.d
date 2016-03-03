@@ -5,10 +5,16 @@
 (setq powerline-arrow-shape 'arrow14)
 
 ;; setup colors
-(set-face-background 'mode-line "grey16")
+;(set-face-background 'mode-line "grey16")
+;(set-face-background 'mode-line-inactive "grey16")
+;(set-face-foreground 'powerline-active1 "#8FB28F")
+;(set-face-foreground 'powerline-active2 "#AFD8AF")
+
+; ample theme
+(set-face-background 'mode-line "#6190c3")
 (set-face-background 'mode-line-inactive "grey16")
-(set-face-foreground 'powerline-active1 "#8FB28F")
-(set-face-foreground 'powerline-active2 "#AFD8AF")
+(set-face-foreground 'powerline-active1 "#5180b3")
+(set-face-foreground 'powerline-active2 "#252525")
 
 ;; modeline items
 (setq display-time-default-load-average nil)
