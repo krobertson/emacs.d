@@ -3,6 +3,7 @@
 
 (depends-on "ace-jump-mode")
 (depends-on "ag")
+(depends-on "arduino-mode")
 (depends-on "auto-complete")
 (depends-on "cask")
 (depends-on "clojure-mode")
