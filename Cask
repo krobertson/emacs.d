@@ -32,6 +32,7 @@
 (depends-on "projectile")
 (depends-on "ruby-end")
 (depends-on "smex")
+(depends-on "terraform-mode")
 (depends-on "undo-tree")
 (depends-on "use-package")
 (depends-on "yaml-mode")

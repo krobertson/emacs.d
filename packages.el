@@ -192,6 +192,9 @@
   (progn
     (smex-initialize)))
 
+(use-package terraform-mode
+  :defer t)
+
 (use-package undo-tree
   :bind (("s-z" . undo-tree-undo)
          ("s-Z" . undo-tree-redo))
