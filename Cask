@@ -30,6 +30,7 @@
 (depends-on "pandoc-mode")
 (depends-on "powerline")
 (depends-on "projectile")
+(depends-on "puppet-mode")
 (depends-on "ruby-end")
 (depends-on "smex")
 (depends-on "terraform-mode")

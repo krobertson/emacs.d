@@ -174,6 +174,9 @@
         "*.cntmp" )))
     (add-to-list 'projectile-globally-ignored-files ".DS_Store")))
 
+(use-package puppet-mode
+  :defer t)
+
 (use-package enh-ruby-mode
   :defer t)
 
