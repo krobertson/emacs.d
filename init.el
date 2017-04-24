@@ -13,7 +13,7 @@
 (cask-initialize)
 
 ;; window size
-(setq default-frame-alist '((font . "Source Code Pro for Powerline-10")
+(setq default-frame-alist '((font . "Source Code Pro for Powerline-12")
                             (width . 190)
                             (height . 60)))
 

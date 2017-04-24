@@ -32,6 +32,7 @@
 (depends-on "projectile")
 (depends-on "puppet-mode")
 (depends-on "ruby-end")
+(depends-on "salt-mode")
 (depends-on "smex")
 (depends-on "terraform-mode")
 (depends-on "undo-tree")

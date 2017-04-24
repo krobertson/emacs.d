@@ -52,7 +52,7 @@
 (use-package exec-path-from-shell
   :config
   (progn
-    (dolist (var '("GOPATH" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
+    (dolist (var '("GOPATH" "GO_GCFLAGS" "SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE"))
       (add-to-list 'exec-path-from-shell-variables var))
     (setq exec-path-from-shell-check-startup-files nil)
     (exec-path-from-shell-initialize)))
@@ -175,6 +175,9 @@
     (add-to-list 'projectile-globally-ignored-files ".DS_Store")))
 
 (use-package puppet-mode
+  :defer t)
+
+(use-package salt-mode
   :defer t)
 
 (use-package enh-ruby-mode
