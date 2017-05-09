@@ -65,6 +65,11 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq ring-bell-function 'ignore)
 
+;; I only ever want 2 windows within emacs. Override the split thresholds to
+;; account for that even on a hidpi monitor.
+(setq split-width-threshold 200)
+(setq split-height-threshold 120)
+
 ;; no backup files, no auto-saving
 (setq make-backup-files nil)
 (setq auto-save-default nil
