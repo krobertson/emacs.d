@@ -19,6 +19,7 @@
         markdown-exdent-or-delete
         nxml-electric-slash
         org-self-insert-command
+        overwrite-mode
         ruby-end-space
         sgml-slash
         sh-assignment

@@ -20,7 +20,7 @@
 (depends-on "go-autocomplete")
 (depends-on "go-mode")
 (depends-on "haml-mode")
-(depends-on "ido-ubiquitous")
+(depends-on "ido-completing-read+")
 (depends-on "js2-mode")
 (depends-on "json-mode")
 (depends-on "lua-mode")

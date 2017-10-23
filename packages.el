@@ -97,14 +97,8 @@
 (use-package haml-mode
   :defer t)
 
-(use-package ido-ubiquitous
-  :init
-  ;; Fix ido-ubiquitous for newer packages
-  (defmacro ido-ubiquitous-use-new-completing-read (cmd package)
-    `(eval-after-load ,package
-       '(defadvice ,cmd (around ido-ubiquitous-new activate)
-          (let ((ido-ubiquitous-enable-compatibility nil))
-            ad-do-it)))))
+(use-package ido-completing-read+
+  :defer t)
 
 (use-package json-mode
   :defer t)
@@ -206,8 +200,7 @@
          ("s-Z" . undo-tree-redo))
   :init
   (progn
-    (defalias 'redo 'undo-tree-redo)
-    (defalias 'undo 'undo-tree-undo)
+    (global-undo-tree-mode)
     ))
 
 (use-package yaml-mode
