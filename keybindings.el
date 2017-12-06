@@ -17,6 +17,7 @@
 (global-set-key (kbd "s-<down>")  'end-of-buffer)
 (global-set-key (kbd "<home>")    'smart-line-beginning)
 (global-set-key (kbd "S-<home>")  'smart-move-line-beginning)
+(global-set-key (kbd "<end>")     'move-end-of-line)
 
 (global-set-key (kbd "S-s-<left>") 'smart-move-line-beginning)
 
