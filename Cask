@@ -28,6 +28,7 @@
 (depends-on "markdown-mode")
 (depends-on "multiple-cursors")
 (depends-on "pandoc-mode")
+(depends-on "pkgbuild-mode")
 (depends-on "powerline")
 (depends-on "projectile")
 (depends-on "puppet-mode")
