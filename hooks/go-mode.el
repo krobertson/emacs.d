@@ -12,4 +12,5 @@
 (add-hook 'before-save-hook 'gofmt-before-save)
 
 ;; enable flycheck mode
+(setq-default flycheck-disabled-checkers '(go-golint))
 (flycheck-mode)
