@@ -174,6 +174,9 @@
 (use-package salt-mode
   :defer t)
 
+(use-package scad-mode
+  :defer t)
+
 (use-package enh-ruby-mode
   :defer t)
 
