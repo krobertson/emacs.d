@@ -17,7 +17,7 @@
     "persistent-scratch"
     "Location of *scratch* file contents for persistent-scratch.")
 (defvar persistent-scratch-backup-directory
-    "~/Dropbox/emacs/scratch/"
+    "~/.emacs.d/persistent-scratch/"
     "Location of backups of the *scratch* buffer contents for
    persistent-scratch.")
 

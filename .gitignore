@@ -1,5 +1,4 @@
-elpa/*-readme.txt
-elpa/archives/*
+elpa/*
 ac-comphist.dat
 eshell
 tramp
