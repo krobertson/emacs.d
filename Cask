@@ -29,6 +29,7 @@
 (depends-on "multiple-cursors")
 (depends-on "pandoc-mode")
 (depends-on "pkgbuild-mode")
+(depends-on "platformio-mode")
 (depends-on "powerline")
 (depends-on "projectile")
 (depends-on "puppet-mode")
