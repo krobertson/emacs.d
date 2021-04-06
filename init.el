@@ -7,7 +7,7 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
-(package-initialize)
+;;(package-initialize)
 
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
@@ -106,7 +106,8 @@
 
 ;; os x
 (when (string= system-type "darwin")
-  (setq mac-allow-anti-aliasing t
+  (setq mac-option-key-is-meta t
+        mac-allow-anti-aliasing t
         delete-by-moving-to-trash t
         browse-url-browser-function 'browse-url-default-macosx-browser
         trash-directory (expand-file-name ".Trash" (getenv "HOME"))))

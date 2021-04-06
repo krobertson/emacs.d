@@ -7,6 +7,7 @@
 (depends-on "auto-complete")
 (depends-on "cask")
 (depends-on "clojure-mode")
+(depends-on "csharp-mode")
 (depends-on "diminish")
 (depends-on "dockerfile-mode")
 (depends-on "enh-ruby-mode")
